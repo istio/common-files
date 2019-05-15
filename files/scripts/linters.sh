@@ -37,7 +37,7 @@ fi
 if test -f "${ROOTDIR}/repolinters.sh"
 then
     source "${ROOTDIR}/repolinters.sh"
-endif
+fi
 
 # if you want to update this version, also change the version number in .golangci.yml
 GOLANGCI_VERSION="v1.16.0"
