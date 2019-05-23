@@ -36,6 +36,7 @@ fi
 # run any specialized per-repo linters
 if test -f "${ROOTDIR}/repolinters.sh"
 then
+    # shellcheck source=/dev/null
     source "${ROOTDIR}/repolinters.sh"
 fi
 
