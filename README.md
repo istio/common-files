@@ -1,5 +1,3 @@
-[![Mergify Status](https://gh.mergify.io/badges/istio/common-files.png?style=cut)](https://mergify.io)
-
 # Common Files
 
 This repository contains build-related files used by several Istio repos.
