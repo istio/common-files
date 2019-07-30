@@ -28,4 +28,4 @@ ROOTDIR=$(dirname "${SCRIPTPATH}")
 
 img=gcr.io/istio-testing/api-build-tools:2019-07-30
 
-docker run -i --sig-proxy=true --rm --entrypoint go-bindata --user $(id -u) -v /etc/passwd:/etc/passwd:ro -v "${ROOTDIR}:${ROOTDIR}" -w "$(pwd)" ${img} "$@"
+docker run -i --sig-proxy=true --rm --entrypoint go-bindata --user "$(id -u)" -v /etc/passwd:/etc/passwd:ro -v "${ROOTDIR}:${ROOTDIR}" -w "$(pwd)" ${img} "$@"
