@@ -20,6 +20,7 @@
 # limitations under the License.
 
 RUN =
+GOBIN ?= ./out/bin
 
 # Set the environment variable BUILD_WITH_CONTAINER to use a container
 # to build the repo. The only dependencies in this mode are to have make and
