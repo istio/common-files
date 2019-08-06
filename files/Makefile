@@ -23,8 +23,8 @@ RUN =
 
 # Set the enviornment variable BUILD_WITH_CONTAINER to use a container
 # to build the repo. The only dependencies in this mode are to have make and
-# docker. If you're building with a local tool chain instead, you need to
-# figure out what  you need in your environment to make that work.
+# docker. If you'd rather build with a local tool chain instead, you'll need to
+# figure out all the tools you need in your environment to make that work.
 export BUILD_WITH_CONTAINER ?= 0
 ifeq ($(BUILD_WITH_CONTAINER),1)
 IMG = gcr.io/istio-testing/build-tools:2019-08-05
@@ -47,3 +47,6 @@ MAKE = $(RUN) make -f Makefile.core.mk
 
 %:
 	@$(MAKE) $@
+
+default:
+	@$(MAKE)
