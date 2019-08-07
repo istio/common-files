@@ -31,7 +31,7 @@ IMG = gcr.io/istio-testing/build-tools:2019-08-07
 UID = $(shell id -u)
 PWD = $(shell pwd)
 GOBIN_SOURCE ?= $(GOPATH)/bin
-GOBIN ?= ./out/bin
+export GOBIN ?= /work/out/bin
 
 LOCAL_ARCH := $(shell uname -m)
 ifeq ($(LOCAL_ARCH),x86_64)
@@ -59,6 +59,7 @@ export GOOS ?= $(GOOS_LOCAL)
 RUN = docker run -t --sig-proxy=true -u $(UID) --rm \
 	-e GOOS="$(GOOS)" \
 	-e GOARCH="$(GOARCH)" \
+	-e GOBIN="$(GOBIN)" \
 	-v /etc/passwd:/etc/passwd:ro \
 	-v $(readlink /etc/localtime):/etc/localtime:ro \
 	--mount type=bind,source="$(PWD)",destination="/work" \
@@ -66,6 +67,8 @@ RUN = docker run -t --sig-proxy=true -u $(UID) --rm \
 	--mount type=volume,source=istio-go-cache,destination="/gocache" \
 	--mount type=bind,source="$(GOBIN_SOURCE)",destination="/go/out/bin" \
 	-w /work $(IMG)
+else
+export GOBIN ?= ./out/bin
 endif
 
 MAKE = $(RUN) make -e -f Makefile.core.mk
