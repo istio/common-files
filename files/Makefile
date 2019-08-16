@@ -19,6 +19,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# allow optional per-repo overrides
+-include Makefile.overrides.mk
+
 RUN =
 
 # Set the environment variable BUILD_WITH_CONTAINER to use a container
@@ -62,6 +65,7 @@ RUN = docker run -t --sig-proxy=true -u $(UID) --rm \
 	-e GOBIN="$(GOBIN)" \
 	-v /etc/passwd:/etc/passwd:ro \
 	-v $(readlink /etc/localtime):/etc/localtime:ro \
+	$(CONTAINER_OPTIONS) \
 	--mount type=bind,source="$(PWD)",destination="/work" \
 	--mount type=volume,source=istio-go-mod,destination="/go/pkg/mod" \
 	--mount type=volume,source=istio-go-cache,destination="/gocache" \
