@@ -47,4 +47,4 @@ update-common:
 	# temporary, until cleaned up in all repos
 	@rm -fr scripts/check_license.sh
 
-.PHONY lint-dockerfiles lint-scripts lint-yaml lint-copyright-banner lint-go format-go update-common
+.PHONY: lint-dockerfiles lint-scripts lint-yaml lint-copyright-banner lint-go format-go update-common
