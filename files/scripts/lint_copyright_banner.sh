@@ -27,21 +27,17 @@ SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOTDIR=$(dirname "${SCRIPTPATH}")
 cd "${ROOTDIR}"
 
-ret=0
-for fn in $(find "${ROOTDIR}" -type f \( -name '*.go' -o -name '*.cc' -o -name '*.h' -o -name '*.sh' -o -name '*.proto' \) | grep -v vendor); do
-  if [[ $fn == *.pb.* ]] || [[ $fn == *.gen.* ]];then
-    continue
-  fi
-
-  if ! head -20 "$fn" | grep "Apache License, Version 2" > /dev/null; then
+ec=0
+for fn in $(find "${ROOTDIR}" -path ./vendor -prune -o -type f \( -name '*.go' -o -name '*.cc' -o -name '*.h' -o -name '*.proto' -o -name '*.py' -o -name '*.sh' \)  ! -name '*.gen.go' ! -name '*.pb.go' -print0 | xargs -0 grep -L -e "Copyright"); do
+  if ! grep -e "Apache License, Version 2" "${fn}"; then
     echo "${fn} missing license"
-    ret=$((ret+1))
+    ec=1
   fi
 
-  if ! head -20 "$fn" | grep Copyright > /dev/null; then
+  if ! grep -e Copyright "${fn}"; then
     echo "${fn} missing Copyright"
-    ret=$((ret+1))
+    ec=1
   fi
 done
 
-exit $ret
+exit $ec
