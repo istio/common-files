@@ -24,7 +24,6 @@ if [[ "${VERBOSE}" == "1" ]];then
 fi
 
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SCRIPTDIR=$(dirname "${SCRIPTPATH}")
 
 OUT=${1:?"output path"}
 BUILDPATH=${2:?"path to build"}
@@ -53,7 +52,7 @@ fi
 # at the beginning of the build and used throughout
 if [[ -z ${BUILDINFO} ]];then
     BUILDINFO=$(mktemp)
-    "${SCRIPTDIR}/report_build_info.sh" > "${BUILDINFO}"
+    "${SCRIPTPATH}/report_build_info.sh" > "${BUILDINFO}"
 fi
 
 # BUILD LD_EXTRAFLAGS
