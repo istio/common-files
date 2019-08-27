@@ -57,4 +57,11 @@ update-common:
 	@cp -r common-files/files/* .
 	@rm -fr common-files
 
-.PHONY: lint-dockerfiles lint-scripts lint-yaml lint-copyright-banner lint-go lint-pyhton lint-helm format-go format-python update-common
+update-common-protos:
+	@git clone --depth 1 --single-branch --branch master https://github.com/istio/common-files
+	@cd common-files ; git rev-parse HEAD >files/common-protos/.commonfiles.sha
+	@git rm -fr protos
+	@cp -ar common-files/common-protos common-protos
+	@rm -fr common-files
+
+.PHONY: lint-dockerfiles lint-scripts lint-yaml lint-copyright-banner lint-go lint-pyhton lint-helm format-go format-python update-common update-common-protos
