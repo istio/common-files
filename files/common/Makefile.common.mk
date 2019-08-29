@@ -59,8 +59,7 @@ update-common:
 
 update-common-protos:
 	@git clone --depth 1 --single-branch --branch master https://github.com/istio/common-files
-	@cd common-files ; git rev-parse HEAD >files/common-protos/.commonfiles.sha
-	@git rm -fr protos
+	@cd common-files ; git rev-parse HEAD > common-protos/.commonfiles.sha
 	@cp -ar common-files/common-protos common-protos
 	@rm -fr common-files
 
