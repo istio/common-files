@@ -63,14 +63,14 @@ format-python:
 	@${FINDFILES} -name '*.py' -print0 | ${XARGS} autopep8 --max-line-length 160 --aggressive --aggressive -i
 
 update-common:
-	@git clone --depth 1 --single-branch --branch master https://github.com/istio/common-files
+	@git clone -q --depth 1 --single-branch --branch master https://github.com/istio/common-files
 	@cd common-files ; git rev-parse HEAD >files/common/.commonfiles.sha
 	@rm -fr common
 	@cp -r common-files/files/* .
 	@rm -fr common-files
 
 update-common-protos:
-	@git clone --depth 1 --single-branch --branch master https://github.com/istio/common-files
+	@git clone -q --depth 1 --single-branch --branch master https://github.com/istio/common-files
 	@cd common-files ; git rev-parse HEAD > common-protos/.commonfiles.sha
 	@cp -ar common-files/common-protos common-protos
 	@rm -fr common-files
