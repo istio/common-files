@@ -27,6 +27,8 @@ TEMPDIR_API="$(mktemp -d /tmp/api-XXXXXXXX)"
 TEMPDIR_APIMACHINERY="$(mktemp -d /tmp/apimachinery-XXXXXXXX)"
 TEMPDIR_GOGO="$(mktemp -d /tmp/gogo-XXXXXXXX)"
 TEMPDIR_PROTOCGENVALIDATE="$(mktemp -d /tmp/genvalidate-XXXXXXXX)"
+TEMPDIR_OPENCENSUS="$(mktemp -d /tmp/opencensus-XXXXXXXX)"
+TEMPDIR_PROMETHEUS="$(mktemp -d /tmp/prometheus-XXXXXXXX)"
 
 # Upstream GIT tags or branches used for protobufs by repo
 PROTOCOLBUFFERS_TAG="516f8b15603b7f7613e2fb957c55bc56a36b64a6"
@@ -35,6 +37,8 @@ API_TAG="eb06f43765d3e053d360c9f9755d15004c35e5f9"
 APIMACHINERY_TAG="508c689428e40ab183bc7d43cac6738714bdd3dc"
 GOGO_TAG="4c00d2f19fb91be5fecd8681fa83450a2a979e69"
 PROTOCGENVALIDATE_TAG="b2e4ad3b1fe3766cf83f85a6b3755625cacf9410"
+OPENCENSUS_TAG="5cec5ea58c3efa81fa808f2bd38ce182da9ee731"
+PROMETHEUS_TAG="14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016"
 
 # Retrieve a copy of Googles's protobufs
 pushd "${TEMPDIR_PROTOCOLBUFFERS}" || exit
@@ -102,6 +106,24 @@ popd || exit
 find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/github.com/envoyproxy
 popd || exit
 
+# Retrieve a copy of opencensus's proto files
+pushd "${TEMPDIR_OPENCENSUS}" || exit
+git clone --depth 1 --single-branch --branch master https://github.com/census-instrumentation/opencensus-proto.git
+pushd opencensus-proto || exit
+git checkout ${OPENCENSUS_TAG}
+popd || exit
+find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/github.com/census-instrumentation
+popd || exit
+
+# Retrieve a copy of prometheus's proto files
+pushd "${TEMPDIR_PROMETHEUS}" || exit
+git clone --depth 1 --single-branch --branch master https://github.com/prometheus/client_model.git
+pushd client_model || exit
+git checkout ${PROMETHEUS_TAG}
+popd || exit
+find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/github.com/prometheus
+popd || exit
+
 # Clean up junk that is not needed
 find common-protos -name vendor -exec rm -rf {} \; > /dev/null 2>&1
 find common-protos -name \*test\* -exec rm -rf {} \; > /dev/null 2>&1
@@ -113,3 +135,5 @@ rm -rf "${TEMPDIR_API}" > /dev/null 2>&1
 rm -rf "${TEMPDIR_APIMACHINERY}" > /dev/null 2>&1
 rm -rf "${TEMPDIR_GOGO}" > /dev/null 2>&1
 rm -rf "${TEMPDIR_PROTOCGENVALIDATE}" > /dev/null 2>&1
+rm -rf "${TEMPDIR_OPENCENSUS}" > /dev/null 2>&1
+rm -rf "${TEMPDIR_PROMETHEUS}" > /dev/null 2>&1
