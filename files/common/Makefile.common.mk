@@ -19,7 +19,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FINDFILES=find . \( -path ./vendor -o -path ./.git \) -prune -o -type f
+FINDFILES=find . \( -path ./common-protos -o -path ./.git \) -prune -o -type f
 XARGS = xargs -0 -r
 
 lint-dockerfiles:
