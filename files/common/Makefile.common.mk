@@ -39,7 +39,7 @@ lint-copyright-banner:
 		${XARGS} common/scripts/lint_copyright_banner.sh
 
 lint-go:
-	@${FINDFILES} -name '*.go' \( ! \( -name '*.gen.go' -o -name '*.pb.go' \) \) -print0 | : | ${XARGS} golangci-lint run -j 8 -c ./common/config/.golangci.yml
+	@${FINDFILES} -name '*.go' \( ! \( -name '*.gen.go' -o -name '*.pb.go' \) \) -print0 | ${XARGS} common/scripts/lint_go.sh
 
 lint-python:
 	@${FINDFILES} -name '*.py' \( ! \( -name '*_pb2.py' \) \) -print0 | ${XARGS} autopep8 --max-line-length 160 --exit-code -d
