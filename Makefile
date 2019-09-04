@@ -15,5 +15,5 @@
 lint:
 	@cp files/common/Makefile.common.mk files/Makefile.core.mk
 	@echo >files/Makefile.overrides.mk "BUILD_WITH_CONTAINER ?= 1"
-	@cd files && make -f Makefile lint-go
+	@cd files && make -f Makefile lint-all
 	@rm files/Makefile.core.mk files/Makefile.overrides.mk
