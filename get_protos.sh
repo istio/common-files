@@ -40,89 +40,103 @@ PROTOCGENVALIDATE_TAG="b2e4ad3b1fe3766cf83f85a6b3755625cacf9410"
 OPENCENSUS_TAG="5cec5ea58c3efa81fa808f2bd38ce182da9ee731"
 PROMETHEUS_TAG="14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016"
 
+rm -fr common-protos
+mkdir common-protos
+
 # Retrieve a copy of Googles's protobufs
-pushd "${TEMPDIR_PROTOCOLBUFFERS}" || exit
-git clone --depth 1 --single-branch --branch master https://github.com/protocolbuffers/protobuf.git
-pushd protobuf || exit
-git checkout "${PROTOCOLBUFFERS_TAG}"
-popd || exit
-pushd protobuf/src/google || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/google
-popd || exit
-popd || exit
+echo "google/*"
+pushd "${TEMPDIR_PROTOCOLBUFFERS}" >/dev/null || exit
+git clone -q --single-branch --branch master https://github.com/protocolbuffers/protobuf.git
+pushd protobuf >/dev/null || exit
+git checkout -q "${PROTOCOLBUFFERS_TAG}"
+popd >/dev/null || exit
+pushd protobuf/src/google  >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/google
+popd >/dev/null || exit
+popd >/dev/null || exit
 
 # Retrieve a copy of Googles's protobufs including api, rpc, and type
-pushd "${TEMPDIR_GOOGLEAPIS}" || exit
-git clone --depth 1 --single-branch --branch master https://github.com/googleapis/googleapis.git
-pushd googleapis || exit
-git checkout "${GOOGLEAPIS_TAG}"
-popd || exit
-pushd googleapis/google/api || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/google/api
-popd || exit
-pushd googleapis/google/rpc || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/google/rpc
-popd || exit
-pushd googleapis/google/type || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/google/type
-popd || exit
-popd || exit
+echo "google/*/*"
+pushd "${TEMPDIR_GOOGLEAPIS}" >/dev/null || exit
+git clone -q --single-branch --branch master https://github.com/googleapis/googleapis.git
+pushd googleapis >/dev/null || exit
+git checkout -q "${GOOGLEAPIS_TAG}"
+popd >/dev/null || exit
+pushd googleapis/google/api >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/google/api
+popd >/dev/null || exit
+pushd googleapis/google/rpc >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/google/rpc
+popd >/dev/null || exit
+pushd googleapis/google/type >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/google/type
+popd >/dev/null || exit
+popd >/dev/null || exit
 
 # Retrieve a copy of K8s api proto files
-pushd "${TEMPDIR_API}" || exit
-git clone --depth 1 --single-branch --branch master https://github.com/kubernetes/api.git
-pushd api || exit
-git checkout "${API_TAG}"
-popd || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/k8s.io
-popd || exit
+echo "k8s.io/api"
+pushd "${TEMPDIR_API}" >/dev/null || exit
+git clone -q --single-branch --branch master https://github.com/kubernetes/api.git
+pushd api >/dev/null || exit
+git checkout -q "${API_TAG}"
+popd >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/k8s.io
+popd >/dev/null || exit
 
 # Retrieve a copy of K8s apimachinery proto files
-pushd "${TEMPDIR_APIMACHINERY}" || exit
-git clone --depth 1 --single-branch --branch master https://github.com/kubernetes/apimachinery.git
-pushd apimachinery || exit
-git checkout ${APIMACHINERY_TAG}
-popd || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/k8s.io
-popd || exit
+echo "k8s.io/apimachinery"
+pushd "${TEMPDIR_APIMACHINERY}" >/dev/null || exit
+git clone -q --single-branch --branch master https://github.com/kubernetes/apimachinery.git
+pushd apimachinery >/dev/null || exit
+git checkout -q ${APIMACHINERY_TAG}
+popd >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/k8s.io
+popd >/dev/null || exit
 
 # Retrieve a copy of gogo's proto files
-pushd "${TEMPDIR_GOGO}" || exit
-git clone --depth 1 --single-branch --branch master https://github.com/gogo/protobuf.git
-pushd protobuf || exit
-git checkout ${GOGO_TAG}
-popd || exit
-pushd protobuf/gogoproto/ || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/gogoproto
-popd || exit
-popd || exit
+echo "gogo"
+pushd "${TEMPDIR_GOGO}" >/dev/null || exit
+git clone -q --single-branch --branch master https://github.com/gogo/protobuf.git
+pushd protobuf >/dev/null || exit
+git checkout -q ${GOGO_TAG}
+pushd protobuf >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/github.com/gogo/protobuf/protobuf
+popd >/dev/null || exit
+popd >/dev/null || exit
+pushd protobuf/gogoproto/ >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/gogoproto
+popd >/dev/null || exit
+popd >/dev/null || exit
 
 # Retrieve a copy of envoyproxy's protoc-gen-validate files
-pushd "${TEMPDIR_PROTOCGENVALIDATE}" || exit
-git clone --depth 1 --single-branch --branch master https://github.com/envoyproxy/protoc-gen-validate.git
-pushd protoc-gen-validate || exit
-git checkout ${PROTOCGENVALIDATE_TAG}
-popd || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/github.com/envoyproxy
-popd || exit
+echo "github.com/envoyproxy"
+pushd "${TEMPDIR_PROTOCGENVALIDATE}" >/dev/null || exit
+git clone -q --single-branch --branch master https://github.com/envoyproxy/protoc-gen-validate.git
+pushd protoc-gen-validate >/dev/null || exit
+git checkout -q ${PROTOCGENVALIDATE_TAG}
+popd >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/github.com/envoyproxy
+popd >/dev/null || exit
 
 # Retrieve a copy of opencensus's proto files
-pushd "${TEMPDIR_OPENCENSUS}" || exit
-git clone --depth 1 --single-branch --branch master https://github.com/census-instrumentation/opencensus-proto.git
-pushd opencensus-proto || exit
-git checkout ${OPENCENSUS_TAG}
-popd || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/github.com/census-instrumentation
-popd || exit
+echo "github.com/census-instrumentation"
+pushd "${TEMPDIR_OPENCENSUS}" >/dev/null || exit
+git clone -q --single-branch --branch master https://github.com/census-instrumentation/opencensus-proto.git
+pushd opencensus-proto >/dev/null || exit
+git checkout -q ${OPENCENSUS_TAG}
+popd >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/github.com/census-instrumentation
+popd >/dev/null || exit
 
 # Retrieve a copy of prometheus's proto files
-pushd "${TEMPDIR_PROMETHEUS}" || exit
-git clone --depth 1 --single-branch --branch master https://github.com/prometheus/client_model.git
-pushd client_model || exit
-git checkout ${PROMETHEUS_TAG}
-popd || exit
-find . -name \*proto | cpio -pdm "${REPODIR}"/common-protos/github.com/prometheus
-popd || exit
+echo "github.com/prometheus"
+pushd "${TEMPDIR_PROMETHEUS}" >/dev/null || exit
+git clone -q --single-branch --branch master https://github.com/prometheus/client_model.git
+pushd client_model >/dev/null || exit
+git checkout -q ${PROMETHEUS_TAG}
+popd >/dev/null || exit
+find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/github.com/prometheus
+popd >/dev/null || exit
 
 # Clean up junk that is not needed
 find common-protos -name vendor -exec rm -rf {} \; > /dev/null 2>&1

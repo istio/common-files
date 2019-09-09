@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+update-protos:
+	@./get_protos.sh
+
 lint:
 	@cp files/common/Makefile.common.mk files/Makefile.core.mk
 	@echo >files/Makefile.overrides.mk "BUILD_WITH_CONTAINER ?= 1"
