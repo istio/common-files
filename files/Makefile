@@ -74,7 +74,7 @@ RUN = docker run -t -i --sig-proxy=true -u $(UID) --rm \
 	--mount type=bind,source="$(GOBIN_SOURCE)",destination="/go/out/bin" \
 	-w /work $(IMG)
 else
-export GOBIN ?= ./out/bin
+export GOBIN ?= $(pwd)/out/bin
 RUN =
 endif
 
