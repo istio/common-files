@@ -19,6 +19,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+.DEFAULT_GOAL := default
+
 # allow optional per-repo overrides
 -include Makefile.overrides.mk
 
