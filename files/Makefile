@@ -31,7 +31,7 @@ export BUILD_WITH_CONTAINER ?= 0
 ifeq ($(BUILD_WITH_CONTAINER),1)
 CONTAINER_CLI ?= docker
 DOCKER_SOCKET_MOUNT ?= -v /var/run/docker.sock:/var/run/docker.sock
-IMG ?= gcr.io/istio-testing/build-tools:2019-09-17T18-24-15
+IMG ?= gcr.io/istio-testing/build-tools:2019-09-20T15-04-58
 UID = $(shell id -u)
 PWD = $(shell pwd)
 GOBIN_SOURCE ?= $(GOPATH)/bin
@@ -53,10 +53,10 @@ GOARCH ?= $(GOARCH_LOCAL)
 LOCAL_OS := $(shell uname)
 ifeq ($(LOCAL_OS),Linux)
    GOOS_LOCAL = linux
-   read_link = readlink -f
+   read_link=$(readlink -f /etc/localtime)
 else ifeq ($(LOCAL_OS),Darwin)
    GOOS_LOCAL = darwin
-   read_link = readlink
+   read_link=$(readlink /etc/localtime)
 else
    $(error "This system's OS $(LOCAL_OS) isn't recognized/supported")
 endif
@@ -69,7 +69,7 @@ RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID) --rm \
 	-e GOBIN="$(GOBIN)" \
 	-e BUILD_WITH_CONTAINER="$(BUILD_WITH_CONTAINER)" \
 	-v /etc/passwd:/etc/passwd:ro \
-	-v $(shell $(read_link) /etc/localtime):/etc/localtime:ro \
+	-v $(read_link):/etc/localtime:ro \
 	$(DOCKER_SOCKET_MOUNT) \
 	$(CONTAINER_OPTIONS) \
 	--mount type=bind,source="$(PWD)",destination="/work" \
