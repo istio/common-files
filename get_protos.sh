@@ -141,6 +141,7 @@ popd >/dev/null || exit
 # Clean up junk that is not needed
 find common-protos -name vendor -exec rm -rf {} \; > /dev/null 2>&1
 find common-protos -name \*test\* -exec rm -rf {} \; > /dev/null 2>&1
+find common-protos -name \*ruby\* -exec rm -rf {} \; > /dev/null 2>&1
 
 # Clean up temporary directories
 rm -rf "${TEMPDIR_GOOGLE}" > /dev/null 2>&1
