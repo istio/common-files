@@ -53,13 +53,19 @@ GOARCH ?= $(GOARCH_LOCAL)
 LOCAL_OS := $(shell uname)
 ifeq ($(LOCAL_OS),Linux)
    GOOS_LOCAL = linux
-   read_link=$(readlink -f /etc/localtime)
+   # Apparently Linux needs a -f flag.
+   READLINK_FLAGS="-f"
 else ifeq ($(LOCAL_OS),Darwin)
    GOOS_LOCAL = darwin
-   read_link=$(readlink /etc/localtime)
+   READLINK_FLAGS=""
 else
    $(error "This system's OS $(LOCAL_OS) isn't recognized/supported")
 endif
+
+# Determine the timezone across various platforms to pass into the
+# docker run operation. This operation assumes zoneinfo is within
+# the path of the file.
+TIMEZONE=`readlink $(READLINK_FLAGS) /etc/localtime | sed -e 's/^.*zoneinfo\///'`
 
 GOOS ?= $(GOOS_LOCAL)
 
@@ -68,8 +74,8 @@ RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID) --rm \
 	-e GOARCH="$(GOARCH)" \
 	-e GOBIN="$(GOBIN)" \
 	-e BUILD_WITH_CONTAINER="$(BUILD_WITH_CONTAINER)" \
+	-e TZ="$(TIMEZONE)" \
 	-v /etc/passwd:/etc/passwd:ro \
-	-v $(read_link):/etc/localtime:ro \
 	$(DOCKER_SOCKET_MOUNT) \
 	$(CONTAINER_OPTIONS) \
 	--mount type=bind,source="$(PWD)",destination="/work" \
