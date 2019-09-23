@@ -31,7 +31,7 @@ export BUILD_WITH_CONTAINER ?= 0
 ifeq ($(BUILD_WITH_CONTAINER),1)
 CONTAINER_CLI ?= docker
 DOCKER_SOCKET_MOUNT ?= -v /var/run/docker.sock:/var/run/docker.sock
-IMG ?= gcr.io/istio-testing/build-tools:2019-09-20T15-04-58
+IMG ?= gcr.io/istio-testing/build-tools:2019-09-23T14-42-58
 UID = $(shell id -u)
 PWD = $(shell pwd)
 GOBIN_SOURCE ?= $(GOPATH)/bin
