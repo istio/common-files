@@ -55,6 +55,7 @@ REPO_NAME = $(shell basename $(REPO_ROOT))
 TARGET_OUT ?= $(HOME)/istio_out/$(REPO_NAME)
 
 ifeq ($(BUILD_WITH_CONTAINER),1)
+$(info Building with Istio's cononical build container.)
 CONTAINER_CLI ?= docker
 DOCKER_SOCKET_MOUNT ?= -v /var/run/docker.sock:/var/run/docker.sock
 IMG ?= gcr.io/istio-testing/build-tools:2019-09-23T12-48-14
@@ -79,6 +80,7 @@ RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID) --rm \
 	--mount type=volume,source=home,destination="/home" \
 	-w /work $(IMG)
 else
+$(info Building with your local toolchain.)
 RUN =
 endif
 
