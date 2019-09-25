@@ -61,6 +61,8 @@ IMG ?= gcr.io/istio-testing/build-tools:2019-09-23T12-48-14
 UID = $(shell id -u)
 PWD = $(shell pwd)
 
+$(info Building with the build container: $(IMG).)
+
 # Determine the timezone across various platforms to pass into the
 # docker run operation. This operation assumes zoneinfo is within
 # the path of the file.
@@ -79,6 +81,7 @@ RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID) --rm \
 	--mount type=volume,source=home,destination="/home" \
 	-w /work $(IMG)
 else
+$(info Building with your local toolchain.)
 RUN =
 endif
 
