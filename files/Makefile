@@ -69,7 +69,6 @@ $(info Building with the build container: $(IMG).)
 TIMEZONE=`readlink $(READLINK_FLAGS) /etc/localtime | sed -e 's/^.*zoneinfo\///'`
 
 RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID) --rm \
-	-e BUILD_WITH_CONTAINER="$(BUILD_WITH_CONTAINER)" \
 	-e TZ="$(TIMEZONE)" \
 	-e TARGET_ARCH="$(TARGET_ARCH)" \
 	-e TARGET_OS="$(TARGET_OS)" \
