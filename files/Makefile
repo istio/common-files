@@ -57,7 +57,7 @@ TARGET_OUT ?= $(HOME)/istio_out/$(REPO_NAME)
 ifeq ($(BUILD_WITH_CONTAINER),1)
 CONTAINER_CLI ?= docker
 DOCKER_SOCKET_MOUNT ?= -v /var/run/docker.sock:/var/run/docker.sock
-IMG ?= gcr.io/istio-testing/build-tools:2019-09-29T15-31-13
+IMG ?= gcr.io/istio-testing/build-tools:2019-09-30T05-55-33
 UID = $(shell id -u)
 PWD = $(shell pwd)
 

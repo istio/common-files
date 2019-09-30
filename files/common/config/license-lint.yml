@@ -58,14 +58,53 @@ restricted_licenses:
   - Sleepycat
 
 whitelisted_modules:
+  - bitbucket.org/ww/goautoneg
+  - git.apache.org/thrift.git
   - github.com/apache/thrift
+  - github.com/bazelbuild/buildtools
+  - github.com/BurntSushi/xgb
+  - github.com/dnaeon/go-vcr
   - github.com/ghodss/yaml
+  - github.com/globalsign/mgo
   - github.com/gogo/protobuf
+  - github.com/google/cadvisor
+  - github.com/google/pprof
+  - github.com/gophercloud/gophercloud
+  - github.com/gotestyourself/gotestyourself
+  - github.com/heketi/heketi
+  - github.com/heketi/utils
   - github.com/inconshreveable/mousetrap
+  - github.com/JeffAshton/win_pdh
+  - github.com/jmespath/go-jmespath
+  - github.com/jteeuwen/go-bindata
   - github.com/julienschmidt/httprouter
+  - github.com/kr/logfmt
+  - github.com/libopenstorage/openstorage
+  - github.com/logrusorgru/aurora
   - github.com/magiconair/properties
+  - github.com/Masterminds/semver
+  - github.com/Masterminds/sprig
+  - github.com/mesos/mesos-go
+  - github.com/miekg/dns
+  - github.com/munnerz/goautoneg
+  - github.com/NYTimes/gziphandler
+  - github.com/openshift/origin
   - github.com/pmezard/go-difflib
   - github.com/russross/blackfriday
+  - github.com/russross/blackfriday/v2
+  - github.com/storageos/go-api
+  - github.com/technosophos/moniker
+  - github.com/ulikunitz/xz
+  - github.com/xeipuuv/gojsonpointer
+  - github.com/xeipuuv/gojsonreference
+  - github.com/xi2/xz
+  - github.com/ziutek/mymysql
   - gopkg.in/check.v1
   - gopkg.in/tomb.v1
-  - github.com/kr/logfmt
+  - gopkg.in/yaml.v1
+  - gotest.tools
+  - istio.io/tools
+  - k8s.io/helm
+  - k8s.io/kubernetes
+  - modernc.org/cc
+  - sigs.k8s.io/yaml
