@@ -58,7 +58,7 @@ lint-protos:
 	@if test -d common-protos; then $(FINDFILES) -name '*.proto' -print0 | $(XARGS) -L 1 prototool lint --protoc-bin-path=/usr/bin/protoc --protoc-wkt-path=common-protos; fi
 
 lint-licenses:
-	@go mod download
+	@-go mod download
 	@license-lint --config common/config/license-lint.yml
 
 lint-all: lint-dockerfiles lint-scripts lint-yaml lint-helm lint-copyright-banner lint-go lint-python lint-markdown lint-sass lint-typescript lint-protos lint-licenses
