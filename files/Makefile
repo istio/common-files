@@ -36,7 +36,7 @@ else ifeq ($(shell echo $(LOCAL_ARCH) | head -c 5),armv8)
 else ifeq ($(shell echo $(LOCAL_ARCH) | head -c 4),armv)
     TARGET_ARCH ?= arm
 else
-    $(error "This system's architecture $(LOCAL_ARCH) isn't recognized/supported")
+    $(error This system's architecture $(LOCAL_ARCH) isn't supported)
 endif
 
 LOCAL_OS := $(shell uname)
@@ -47,13 +47,15 @@ else ifeq ($(LOCAL_OS),Darwin)
     TARGET_OS ?= darwin
     READLINK_FLAGS=""
 else
-    $(error "This system's OS $(LOCAL_OS) isn't recognized/supported")
+    $(error This system's OS $(LOCAL_OS) isn't supported)
 endif
+
+export TARGET_OUT ?= $(shell pwd)/out/$(TARGET_ARCH)_$(TARGET_OS)
 
 ifeq ($(BUILD_WITH_CONTAINER),1)
 CONTAINER_CLI ?= docker
 DOCKER_SOCKET_MOUNT ?= -v /var/run/docker.sock:/var/run/docker.sock
-IMG ?= gcr.io/istio-testing/build-tools:2019-10-09T05-08-04
+IMG ?= gcr.io/istio-testing/build-tools:2019-10-09T15-00-30
 UID = $(shell id -u)
 PWD = $(shell pwd)
 
@@ -69,6 +71,7 @@ RUN = $(CONTAINER_CLI) run --net=host -t -i --sig-proxy=true -u $(UID):docker --
 	-e TZ="$(TIMEZONE)" \
 	-e TARGET_ARCH="$(TARGET_ARCH)" \
 	-e TARGET_OS="$(TARGET_OS)" \
+	-e TARGET_OUT="$(TARGET_OUT)" \
 	-v /etc/passwd:/etc/passwd:ro \
 	$(DOCKER_SOCKET_MOUNT) \
 	$(CONTAINER_OPTIONS) \
