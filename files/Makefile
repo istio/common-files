@@ -28,60 +28,11 @@
 # figure out all the tools you need in your environment to make that work.
 export BUILD_WITH_CONTAINER ?= 0
 
-LOCAL_ARCH := $(shell uname -m)
-ifeq ($(LOCAL_ARCH),x86_64)
-    TARGET_ARCH ?= amd64
-else ifeq ($(shell echo $(LOCAL_ARCH) | head -c 5),armv8)
-    TARGET_ARCH ?= arm64
-else ifeq ($(shell echo $(LOCAL_ARCH) | head -c 4),armv)
-    TARGET_ARCH ?= arm
-else
-    $(error This system's architecture $(LOCAL_ARCH) isn't supported)
-endif
-
-LOCAL_OS := $(shell uname)
-ifeq ($(LOCAL_OS),Linux)
-    TARGET_OS ?= linux
-    READLINK_FLAGS="-f"
-else ifeq ($(LOCAL_OS),Darwin)
-    TARGET_OS ?= darwin
-    READLINK_FLAGS=""
-else
-    $(error This system's OS $(LOCAL_OS) isn't supported)
-endif
-
-export TARGET_OUT ?= $(shell pwd)/out/$(TARGET_ARCH)_$(TARGET_OS)
-
 ifeq ($(BUILD_WITH_CONTAINER),1)
-export TARGET_OUT = /work/out/$(TARGET_ARCH)_$(TARGET_OS)
-CONTAINER_CLI ?= docker
-DOCKER_SOCKET_MOUNT ?= -v /var/run/docker.sock:/var/run/docker.sock
 IMG ?= gcr.io/istio-testing/build-tools:2019-10-11T13-37-52
-UID = $(shell id -u)
-PWD = $(shell pwd)
-
-$(info Building with the build container: $(IMG).)
-
-# Determine the timezone across various platforms to pass into the
-# docker run operation. This operation assumes zoneinfo is within
-# the path of the file.
-TIMEZONE=`readlink $(READLINK_FLAGS) /etc/localtime | sed -e 's/^.*zoneinfo\///'`
-
-RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):docker --rm \
-	-e IN_BUILD_CONTAINER="$(BUILD_WITH_CONTAINER)" \
-	-e TZ="$(TIMEZONE)" \
-	-e TARGET_ARCH="$(TARGET_ARCH)" \
-	-e TARGET_OS="$(TARGET_OS)" \
-	-e TARGET_OUT="$(TARGET_OUT)" \
-	-e HUB="$(HUB)" \
-	-e TAG="$(TAG)" \
-	-v /etc/passwd:/etc/passwd:ro \
-	$(DOCKER_SOCKET_MOUNT) \
-	$(CONTAINER_OPTIONS) \
-	--mount type=bind,source="$(PWD)",destination="/work" \
-	--mount type=volume,source=go,destination="/go" \
-	--mount type=volume,source=gocache,destination="/gocache" \
-	-w /work $(IMG)
+export IMG
+$(info Building with the build container: $(IMG))
+RUN = ./common/scripts/run-docker.sh
 else
 $(info Building with your local toolchain.)
 RUN =
@@ -90,10 +41,25 @@ endif
 
 MAKE = $(RUN) make --no-print-directory -e -f Makefile.core.mk
 
+# If these variables are defined in the overrides, exporting them adds them to
+# the environment of the sub-make
+export TARGET_ARCH
+export TARGET_OS
+export TARGET_OUT
+export CONTAINER_CLI
+export DOCKER_SOCKET_MOUNT
+export CONTAINER_OPTIONS
+export TZ
+export HUB
+export TAG
+
 %:
 	@$(MAKE) $@
 
 default:
 	@$(MAKE)
+
+shell:
+	@$(RUN) /bin/bash
 
 .PHONY: default
