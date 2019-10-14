@@ -29,8 +29,6 @@
 export BUILD_WITH_CONTAINER ?= 0
 
 ifeq ($(BUILD_WITH_CONTAINER),1)
-IMG ?= gcr.io/istio-testing/build-tools:2019-10-11T13-37-52
-export IMG
 $(info Building with the build container: $(IMG))
 RUN = ./common/scripts/run-docker.sh
 else

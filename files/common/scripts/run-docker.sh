@@ -49,29 +49,30 @@ fi
 
 timezone=$(readlink $readlink_flags /etc/localtime | sed -e 's/^.*zoneinfo\///')
 
-out="${TARGET_OUT:/work/out/${target_arch}_${target_os}}"
+out="${TARGET_OUT:-/work/out/${target_arch}_${target_os}}"
 
-image="${IMG:-gcr.io/istio-testing/build-tools:latest}"
+image="${IMG:-gcr.io/istio-testing/build-tools:2019-10-11T13-37-52}"
 
 container_cli="${CONTAINER_CLI:-docker}"
 
-$container_cli pull "$image"
+parent_env="-e \"$(env | grep -v "^_\|PATH\|SHELL\|EDITOR\|TMUX\|USER\|HOME\|PWD\|TERM\|GO\|rvm\|SSH" | awk 'ORS="\" -e \""' | sed 's/ -e "$//')"
+
+"$container_cli" pull "$image"
 
 # $CONTAINER_OPTIONS becomes an empty arg when quoted, so SC2086 is disabled for the
 # following command only
 # shellcheck disable=SC2086
-$container_cli run -it --rm -u "$(id -u):docker" \
+"$container_cli" run -it --rm -u "$(id -u):docker" \
     --sig-proxy=true \
     ${DOCKER_SOCKET_MOUNT:+"-v /var/run/docker.sock:/var/run/docker.sock"} \
     -v /etc/passwd:/etc/passwd:ro \
     $CONTAINER_OPTIONS \
+    "$parent_env" \
     -e IN_BUILD_CONTAINER=1 \
     -e TZ="${timezone:-$TZ}" \
     -e TARGET_ARCH="${TARGET_ARCH:-$target_arch}" \
     -e TARGET_OS="${TARGET_OS:-$target_os}" \
     -e TARGET_OUT="$out" \
-    -e HUB="$HUB" \
-    -e TAG="$TAG" \
     --mount "type=bind,source=$(pwd),destination=/work" \
     --mount "type=volume,source=go,destination=/go" \
     --mount "type=volume,source=gocache,destination=/gocache" \
