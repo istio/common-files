@@ -58,6 +58,7 @@ CONTAINER_CLI ?= docker
 DOCKER_SOCKET_MOUNT ?= -v /var/run/docker.sock:/var/run/docker.sock
 IMG ?= gcr.io/istio-testing/build-tools:2019-10-18T14-38-25
 UID = $(shell id -u)
+GID = `grep docker /etc/group | cut -f3 -d:`
 PWD = $(shell pwd)
 
 $(info Building with the build container: $(IMG).)
@@ -67,7 +68,7 @@ $(info Building with the build container: $(IMG).)
 # the path of the file.
 TIMEZONE=`readlink $(READLINK_FLAGS) /etc/localtime | sed -e 's/^.*zoneinfo\///'`
 
-RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):docker --rm \
+RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):$(GID) --rm \
 	-e IN_BUILD_CONTAINER="$(BUILD_WITH_CONTAINER)" \
 	-e TZ="$(TIMEZONE)" \
 	-e TARGET_ARCH="$(TARGET_ARCH)" \
@@ -81,6 +82,8 @@ RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):docker --rm \
 	--mount type=bind,source="$(PWD)",destination="/work" \
 	--mount type=volume,source=go,destination="/go" \
 	--mount type=volume,source=gocache,destination="/gocache" \
+	--mount type=bind,source="$(HOME)/.docker",destination="/config/.docker" \
+	--mount type=bind,source="$(HOME)/.config/gcloud",destination="/config/.config/gcloud" \
 	-w /work $(IMG)
 
 MAKE = $(RUN) make --no-print-directory -e -f Makefile.core.mk
