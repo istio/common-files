@@ -68,6 +68,19 @@ $(info Building with the build container: $(IMG).)
 # the path of the file.
 TIMEZONE=`readlink $(READLINK_FLAGS) /etc/localtime | sed -e 's/^.*zoneinfo\///'`
 
+# Determine the docker.push credential bind mounts.
+# Docker and GCR are supported credentials. At this time docker.push may
+# not work well on Docker-For-Mac. This will be handled in a follow-up PR.
+DOCKER_CREDS_MOUNT:=
+ifneq (,$(wildcard $(HOME)/.docker))
+$(info Using docker credential directory $(HOME)/.docker.)
+DOCKER_CREDS_MOUNT+=--mount type=bind,source="$(HOME)/.docker",destination="/config/.docker",readonly
+endif
+ifneq (,$(wildcard $(HOME)/.config/gcloud))
+$(info Using gcr credential directory $(HOME)/.config/gcloud.)
+DOCKER_CREDS_MOUNT+=--mount type=bind,source="$(HOME)/.config/gcloud",destination="/config/.config/gcloud",readonly
+endif
+
 RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):$(GID) --rm \
 	-e IN_BUILD_CONTAINER="$(BUILD_WITH_CONTAINER)" \
 	-e TZ="$(TIMEZONE)" \
@@ -82,8 +95,7 @@ RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):$(GID) --rm \
 	--mount type=bind,source="$(PWD)",destination="/work" \
 	--mount type=volume,source=go,destination="/go" \
 	--mount type=volume,source=gocache,destination="/gocache" \
-	--mount type=bind,source="$(HOME)/.docker",destination="/config/.docker" \
-	--mount type=bind,source="$(HOME)/.config/gcloud",destination="/config/.config/gcloud" \
+	$(DOCKER_CREDS_MOUNT) \
 	-w /work $(IMG)
 
 MAKE = $(RUN) make --no-print-directory -e -f Makefile.core.mk
