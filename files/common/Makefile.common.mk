@@ -80,6 +80,10 @@ dump-licenses-csv:
 	@go mod download
 	@license-lint --config common/config/license-lint.yml --csv
 
+mirror-licenses:
+	@go mod download
+	@license-lint --mirror
+
 TMP := $(shell mktemp -d -u)
 UPDATE_BRANCH ?= "master"
 
