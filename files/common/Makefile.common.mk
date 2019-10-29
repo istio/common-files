@@ -89,7 +89,7 @@ mirror-licenses:
 	@license-lint --mirror
 
 TMP := $(shell mktemp -d -u)
-UPDATE_BRANCH ?= "master"
+UPDATE_BRANCH ?= "release-1.4"
 
 update-common:
 	@mkdir -p $(TMP)
