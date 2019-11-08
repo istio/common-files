@@ -118,7 +118,7 @@ default:
 else
 
 $(info Building with your local toolchain.)
-GOBIN ?= $(GOPATH)/bin
+export GOBIN ?= $(GOPATH)/bin
 include Makefile.core.mk
 
 endif
