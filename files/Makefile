@@ -92,7 +92,7 @@ RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):docker --rm \
 else
 $(info Building with your local toolchain.)
 RUN =
-GOBIN ?= $(GOPATH)/bin
+export GOBIN ?= $(GOPATH)/bin
 endif
 
 MAKE = $(RUN) make --no-print-directory -e -f Makefile.core.mk
