@@ -22,6 +22,13 @@
 FINDFILES=find . \( -path ./common-protos -o -path ./.git -o -path ./.github -o -path ./licenses \) -prune -o -type f
 XARGS = xargs -0 -r
 
+comma := ,
+ifeq ($(COPYRIGHT_LINT_WHITELIST),)
+  FILTER_COPYRIGHT_WHITELIST=cat
+else
+  FILTER_COPYRIGHT_WHITELIST=egrep -vxzZ -e ./$(subst $(comma),|./,$(COPYRIGHT_LINT_WHITELIST))
+endif
+
 lint-dockerfiles:
 	@${FINDFILES} -name 'Dockerfile*' -print0 | ${XARGS} hadolint -c ./common/config/.hadolint.yml
 
@@ -36,6 +43,7 @@ lint-helm:
 
 lint-copyright-banner:
 	@${FINDFILES} \( -name '*.go' -o -name '*.cc' -o -name '*.h' -o -name '*.proto' -o -name '*.py' -o -name '*.sh' \) \( ! \( -name '*.gen.go' -o -name '*.pb.go' -o -name '*_pb2.py' \) \) -print0 |\
+		$(FILTER_COPYRIGHT_WHITELIST) |\
 		${XARGS} common/scripts/lint_copyright_banner.sh
 
 lint-go:
