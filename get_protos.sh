@@ -43,6 +43,10 @@ PROMETHEUS_TAG="14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016"
 rm -fr common-protos
 mkdir common-protos
 
+# Copy istio extension protobufs
+echo "istio.io/*"
+cp -a "${REPODIR}"/protos/istio.io "${REPODIR}"/common-protos/istio.io
+
 # Retrieve a copy of Googles's protobufs
 echo "google/*"
 pushd "${TEMPDIR_PROTOCOLBUFFERS}" >/dev/null || exit
