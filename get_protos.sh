@@ -40,8 +40,12 @@ PROTOCGENVALIDATE_TAG="b2e4ad3b1fe3766cf83f85a6b3755625cacf9410"
 OPENCENSUS_TAG="5cec5ea58c3efa81fa808f2bd38ce182da9ee731"
 PROMETHEUS_TAG="14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016"
 
-mkdir -p common-protos
-rm -fr common-protos/github.com common-protos/gogoproto common-protos/google common-protos/k8s.io
+rm -fr common-protos
+mkdir common-protos
+
+# Copy istio extension protobufs
+echo "istio.io/*"
+cp -a "${REPODIR}"/protos/istio.io "${REPODIR}"/common-protos/istio.io
 
 # Retrieve a copy of Googles's protobufs
 echo "google/*"
