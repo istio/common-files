@@ -23,12 +23,13 @@
 
 set -e
 
-export LOCAL_ARCH=$(uname -m)
+LOCAL_ARCH=$(uname -m)
+export LOCAL_ARCH
 if [[ ${LOCAL_ARCH} == x86_64 ]]; then
     export TARGET_ARCH=amd64
 elif [[ ${LOCAL_ARCH} == armv8* ]]; then
     export TARGET_ARCH=arm64
-elif [[ $local_arch == aarch64* ]]; then
+elif [[ ${LOCAL_ARCH} == aarch64* ]]; then
     export TARGET_ARCH=arm64
 elif [[ ${LOCAL_ARCH} == armv* ]]; then
     export TARGET_ARCH=arm
@@ -37,7 +38,8 @@ else
     exit 1
 fi
 
-export LOCAL_OS=$(uname)
+LOCAL_OS=$(uname)
+export LOCAL_OS
 if [[ $LOCAL_OS == Linux ]]; then
     export TARGET_OS=linux
     readlink_flags="-f"
@@ -50,9 +52,11 @@ else
 fi
 
 export UID
-export DOCKER_GID=$(grep docker /etc/group | cut -f3 -d:)
+DOCKER_GID=$(grep docker /etc/group | cut -f3 -d:)
+export DOCKER_GID
 
-export TIMEZONE=$(readlink $readlink_flags /etc/localtime | sed -e 's/^.*zoneinfo\///')
+TIMEZONE=$(readlink $readlink_flags /etc/localtime | sed -e 's/^.*zoneinfo\///')
+export TIMEZONE
 
 export TARGET_OUT="${TARGET_OUT:-${PWD}/out/${TARGET_OS}_${TARGET_ARCH}}"
 export TARGET_OUT_LINUX="${TARGET_OUT_LINUX:-${PWD}/out/linux_amd64}"

@@ -31,6 +31,7 @@ SHELL := /bin/bash
 export BUILD_WITH_CONTAINER ?= 0
 
 # Set up environment variables
+$(shell mkdir -p out)
 $(shell $(PWD)/common/scripts/setup_env.sh envfile > out/.env)
 include out/.env
 export out/.env

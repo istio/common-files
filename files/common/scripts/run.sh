@@ -26,6 +26,7 @@ set -e
 WD=$(dirname "$0")
 WD=$(cd "$WD"; pwd)
 
+# shellcheck disable=SC1090
 source "${WD}/setup_env.sh"
 
 # Override variables with container specific
