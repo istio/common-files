@@ -28,6 +28,9 @@
 # figure out all the tools you need in your environment to make that work.
 export BUILD_WITH_CONTAINER ?= 0
 
+# This is the "go test" options
+export T ?= "--timeout=100s"
+
 LOCAL_ARCH := $(shell uname -m)
 ifeq ($(LOCAL_ARCH),x86_64)
     TARGET_ARCH ?= amd64
@@ -108,6 +111,7 @@ RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):$(GID) --rm \
 	-e TARGET_OUT="$(TARGET_OUT)" \
 	-e TARGET_OUT_LINUX="$(TARGET_OUT_LINUX)" \
 	-e USER="${USER}" \
+	-e T="${T}" \
 	-e GOPATH="/work" \
 	-e GOBIN="/work/bin" \
 	$(ENV_VARS) \
