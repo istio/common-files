@@ -29,7 +29,7 @@
 export BUILD_WITH_CONTAINER ?= 0
 
 # This is the "go test" options.
-export T ?= "--timeout=100s"
+export T ?= ""
 
 LOCAL_ARCH := $(shell uname -m)
 ifeq ($(LOCAL_ARCH),x86_64)
