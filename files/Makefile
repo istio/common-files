@@ -28,8 +28,8 @@
 # figure out all the tools you need in your environment to make that work.
 export BUILD_WITH_CONTAINER ?= 0
 
-# This is the "go test" options.
-export T ?= ""
+# This is the "go test" options. Default empty value.
+export T ?=
 
 LOCAL_ARCH := $(shell uname -m)
 ifeq ($(LOCAL_ARCH),x86_64)
