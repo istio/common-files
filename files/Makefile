@@ -28,7 +28,7 @@
 # figure out all the tools you need in your environment to make that work.
 export BUILD_WITH_CONTAINER ?= 0
 
-# This is the "go test" options
+# This is the "go test" options.
 export T ?= "--timeout=100s"
 
 LOCAL_ARCH := $(shell uname -m)
