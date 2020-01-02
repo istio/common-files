@@ -89,7 +89,7 @@ endif
 
 ifneq (,$(wildcard $(HOME)/.kube))
 $(info Using local Kubernetes configuration $(HOME)/.kube)
-CONDITIONAL_HOST_MOUNTS+=--mount type=bind,source="$(HOME)/.kube",destination="/home/.kube",readonly
+CONDITIONAL_HOST_MOUNTS+=--mount type=bind,source="$(HOME)/.kube",destination="/home/.kube"
 endif
 
 ENV_VARS:=
