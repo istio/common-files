@@ -113,6 +113,6 @@ check-clean-repo:
 	@common/scripts/check_clean_repo.sh
 
 tidy-docker:
-	@docker images | grep gcr.io/istio-testing/build-tools | while read c1 c2 c3; do docker rmi -f $c1:$c2; done
+	@docker images | grep gcr.io/istio-testing/build-tools | while read c1 c2 c3; do docker rmi -f $$c1:$$c2; done
 
 .PHONY: lint-dockerfiles lint-scripts lint-yaml lint-copyright-banner lint-go lint-python lint-helm lint-markdown lint-sass lint-typescript lint-protos lint-all format-go format-python format-protos update-common update-common-protos lint-licenses dump-licenses dump-licenses-csv check-clean-repo tidy-docker
