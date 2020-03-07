@@ -30,34 +30,13 @@ SHELL := /bin/bash
 # figure out all the tools you need in your environment to make that work.
 export BUILD_WITH_CONTAINER ?= 0
 
-# Set up environment variables
+# Set up environment variables. Using a common script allows the script and makefile to re-use logic
 $(shell mkdir -p out)
-$(shell $(PWD)/common/scripts/setup_env.sh envfile > out/.env)
-include out/.env
-export out/.env
+$(shell $(PWD)/common/scripts/setup_env.sh)
 
 ifeq ($(BUILD_WITH_CONTAINER),1)
 
-# Override variables with container specific
-export TARGET_OUT=$(CONTAINER_TARGET_OUT)
-export TARGET_OUT_LINUX=$(CONTAINER_TARGET_OUT_LINUX)
-
 RUN = ./common/scripts/run.sh
-IMG ?= gcr.io/istio-testing/build-tools:master-2019-12-15T16-17-48
-
-# If these variables are defined in the overrides, exporting them adds them to
-# the environment of the sub-make
-export TARGET_ARCH
-export TARGET_OS
-export TARGET_OUT
-export CONTAINER_CLI
-export DOCKER_SOCKET_MOUNT
-export CONTAINER_OPTIONS
-export TZ
-export HUB
-export TAG
-export RUN
-export IMG
 
 MAKE = $(RUN) make --no-print-directory -e -f Makefile.core.mk
 

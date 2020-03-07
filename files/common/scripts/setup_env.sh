@@ -51,8 +51,11 @@ else
     exit 1
 fi
 
+# Build image to use
+export IMAGE_VERSION=master-2020-03-05T18-27-04
+
 export UID
-DOCKER_GID=$(grep docker /etc/group | cut -f3 -d:)
+DOCKER_GID=$(grep '^docker:' /etc/group | cut -f3 -d:)
 export DOCKER_GID
 
 TIMEZONE=$(readlink $readlink_flags /etc/localtime | sed -e 's/^.*zoneinfo\///')
@@ -64,11 +67,11 @@ export TARGET_OUT_LINUX="${TARGET_OUT_LINUX:-${PWD}/out/linux_amd64}"
 export CONTAINER_TARGET_OUT="${CONTAINER_TARGET_OUT:-/work/out/${TARGET_OS}_${TARGET_ARCH}}"
 export CONTAINER_TARGET_OUT_LINUX="${CONTAINER_TARGET_OUT_LINUX:-/work/out/linux_amd64}"
 
-export IMG="${IMG:-gcr.io/istio-testing/build-tools:master-2019-12-15T16-17-48}"
+export IMG="${IMG:-gcr.io/istio-testing/build-tools:${IMAGE_VERSION}}"
 
 export CONTAINER_CLI="${CONTAINER_CLI:-docker}"
 
-export ENV_BLACKLIST="${ENV_BLACKLIST:-^_\|PATH\|SHELL\|EDITOR\|TMUX\|USER\|HOME\|PWD\|TERM\|GO\|rvm\|SSH}"
+export ENV_BLOCKLIST="${ENV_BLOCKLIST:-^_\|PATH\|SHELL\|EDITOR\|TMUX\|USER\|HOME\|PWD\|TERM\|GO\|rvm\|SSH}"
 
 # Set up conditional host mounts for docker and kubernetes config
 export CONDITIONAL_HOST_MOUNTS=${CONDITIONAL_HOST_MOUNTS:-}
@@ -79,20 +82,7 @@ if [[ -d "${HOME}/.config/gcloud" ]]; then
   CONDITIONAL_HOST_MOUNTS+="--mount type=bind,source=${HOME}/.config/gcloud,destination=/config/.config/gcloud,readonly "
 fi
 if [[ -d "${HOME}/.kube" ]]; then
-  CONDITIONAL_HOST_MOUNTS+="--mount type=bind,source=${HOME}/.kube,destination=/home/.kube,readonly "
+  CONDITIONAL_HOST_MOUNTS+="--mount type=bind,source=${HOME}/.kube,destination=/home/.kube "
 fi
 
-# Makefile reads from an envfile, script sources
-if [[ "${1}" == "envfile" ]]; then
-  echo "CONDITIONAL_HOST_MOUNTS=${CONDITIONAL_HOST_MOUNTS}"
-  echo "ENV_BLACKLIST=${ENV_BLACKLIST}"
-  echo "CONTAINER_CLI=${CONTAINER_CLI}"
-  echo "IMG=${IMG}"
-  echo "TARGET_OUT_LINUX=${TARGET_OUT_LINUX}"
-  echo "TARGET_OUT=${TARGET_OUT}"
-  echo "TIMEZONE=${TIMEZONE}"
-  echo "LOCAL_OS=${LOCAL_OS}"
-  echo "TARGET_OS=${TARGET_OS}"
-  echo "LOCAL_ARCH=${LOCAL_ARCH}"
-  echo "TARGET_ARCH=${TARGET_ARCH}"
-fi
+export REPO_ROOT=/work

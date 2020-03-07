@@ -39,11 +39,11 @@ export TARGET_OUT_LINUX=${CONTAINER_TARGET_OUT_LINUX}
 "${CONTAINER_CLI}" run -it --rm \
     -u "${UID}:${DOCKER_GID}" \
     --sig-proxy=true \
-    ${DOCKER_SOCKET_MOUNT:+"-v /var/run/docker.sock:/var/run/docker.sock"} \
+    ${DOCKER_SOCKET_MOUNT:--v /var/run/docker.sock:/var/run/docker.sock} \
     -v /etc/passwd:/etc/passwd:ro \
     -v /etc/group:/etc/group:ro \
     $CONTAINER_OPTIONS \
-    --env-file <(env | grep -v ${ENV_BLACKLIST}) \
+    --env-file <(env | grep -v ${ENV_BLOCKLIST}) \
     -e IN_BUILD_CONTAINER=1 \
     -e TZ="${TIMEZONE:-$TZ}" \
     --mount "type=bind,source=${PWD},destination=/work" \
