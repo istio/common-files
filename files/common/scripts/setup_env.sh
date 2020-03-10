@@ -51,6 +51,9 @@ else
     exit 1
 fi
 
+# Setup common .gitignore
+git config --local core.excludesfile ./common/config/.gitignore_common
+
 # Build image to use
 if [[ "${IMAGE_VERSION:-}" == "" ]]; then
   export IMAGE_VERSION=master-2020-03-05T18-27-04
