@@ -9,6 +9,7 @@ unrestricted_licenses:
   - BSD-1-Clause
   - BSD-2-Clause
   - BSD-3-Clause
+  - 0BSD
   - FTL
   - LPL-1.02
   - MS-PL
@@ -23,6 +24,7 @@ unrestricted_licenses:
 
 reciprocal_licenses:
   - CC0-1.0
+  - CC-BY-3.0
   - APSL-2.0
   - CDDL-1.0
   - CDDL-1.1
@@ -32,6 +34,7 @@ reciprocal_licenses:
   - MPL-1.0
   - MPL-1.1
   - MPL-2.0
+  - MPL-2.0-no-copyleft-exception
   - Ruby
 
 restricted_licenses:
@@ -146,6 +149,16 @@ whitelisted_modules:
 
   # The core library is MIT licensed, but a submodule imports a BSD-3 license that licensee fails to correctly identify
   - github.com/vektah/gqlparser
+
+  # Apache 2.0
+  - github.com/spf13/cobra
+  - github.com/spf13/afero
+
+  # BSD-3 by pointer to another repo (github.com/gonum/license/blob/master/LICENSE)
+  - gonum.org/v1/plot
+
+  # FTL (https://github.com/golang/freetype/blob/master/licenses/ftl.txt)
+  - github.com/golang/freetype
 
   - github.com/ziutek/mymysql
   - gopkg.in/check.v1
