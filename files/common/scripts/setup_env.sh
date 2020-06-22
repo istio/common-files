@@ -104,7 +104,7 @@ if [[ -d "${HOME}/.config/gcloud" ]]; then
   CONDITIONAL_HOST_MOUNTS+="--mount type=bind,source=${HOME}/.config/gcloud,destination=/config/.config/gcloud,readonly,consistency=delegated "
 fi
 
-# Thus function checks if the file exists. If it does, it creates a randomly named host location
+# This function checks if the file exists. If it does, it creates a randomly named host location
 # for the file, adds it to the host KUBECONFIG, and creates a mount for it.
 add_KUBECONFIG_if_exists () {
   if [[ -f "$1" ]]; then
