@@ -78,22 +78,18 @@ popd >/dev/null || exit
 popd >/dev/null || exit
 
 # Retrieve a copy of K8s api proto files
-echo "k8s.io/api"
+echo "kubernetes/api"
 pushd "${TEMPDIR_API}" >/dev/null || exit
 git clone -q --single-branch --branch master https://github.com/kubernetes/api.git
-pushd api >/dev/null || exit
 git checkout -q "${API_TAG}"
-popd >/dev/null || exit
 find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/k8s.io
 popd >/dev/null || exit
 
 # Retrieve a copy of K8s apimachinery proto files
-echo "k8s.io/apimachinery"
+echo "kubernetes/apimachinery"
 pushd "${TEMPDIR_APIMACHINERY}" >/dev/null || exit
 git clone -q --single-branch --branch master https://github.com/kubernetes/apimachinery.git
-pushd apimachinery >/dev/null || exit
 git checkout -q ${APIMACHINERY_TAG}
-popd >/dev/null || exit
 find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/k8s.io
 popd >/dev/null || exit
 
