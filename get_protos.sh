@@ -18,6 +18,7 @@
 # locations. The proto file's repository is pinned. The pinned protos
 # are then copied into a directory called "protos".
 
+set -x
 REPODIR="$(pwd)"
 
 # Temporary directories securely created
@@ -31,10 +32,10 @@ TEMPDIR_OPENCENSUS="$(mktemp -d /tmp/opencensus-XXXXXXXX)"
 TEMPDIR_PROMETHEUS="$(mktemp -d /tmp/prometheus-XXXXXXXX)"
 
 # Upstream GIT tags or branches used for protobufs by repo
-PROTOCOLBUFFERS_TAG="516f8b15603b7f7613e2fb957c55bc56a36b64a6"
-GOOGLEAPIS_TAG="e121a35579e73377f998c11bcc09ba0486736404"
-API_TAG="eb06f43765d3e053d360c9f9755d15004c35e5f9"
-APIMACHINERY_TAG="508c689428e40ab183bc7d43cac6738714bdd3dc"
+PROTOCOLBUFFERS_TAG="fde7cf7358ec7cd69e8db9be4f1fa6a5c431386a"
+GOOGLEAPIS_TAG="1d5522ad1056f16a6d593b8f3038d831e64daeea"
+API_TAG="94c4f9061bc5a4b826b39418fc2ea3422505d25f"
+APIMACHINERY_TAG="2a282836017bf9a6d16c6bbc8ac3d4fdddc6a418"
 GOGO_TAG="0ca988a254f991240804bf9821f3450d87ccbb1b"
 PROTOCGENVALIDATE_TAG="b2e4ad3b1fe3766cf83f85a6b3755625cacf9410"
 OPENCENSUS_TAG="5cec5ea58c3efa81fa808f2bd38ce182da9ee731"
@@ -78,22 +79,18 @@ popd >/dev/null || exit
 popd >/dev/null || exit
 
 # Retrieve a copy of K8s api proto files
-echo "k8s.io/api"
+echo "kubernetes/api"
 pushd "${TEMPDIR_API}" >/dev/null || exit
 git clone -q --single-branch --branch master https://github.com/kubernetes/api.git
-pushd api >/dev/null || exit
 git checkout -q "${API_TAG}"
-popd >/dev/null || exit
 find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/k8s.io
 popd >/dev/null || exit
 
 # Retrieve a copy of K8s apimachinery proto files
-echo "k8s.io/apimachinery"
+echo "kubernetes/apimachinery"
 pushd "${TEMPDIR_APIMACHINERY}" >/dev/null || exit
 git clone -q --single-branch --branch master https://github.com/kubernetes/apimachinery.git
-pushd apimachinery >/dev/null || exit
 git checkout -q ${APIMACHINERY_TAG}
-popd >/dev/null || exit
 find . -name \*proto | cpio --quiet -pdm "${REPODIR}"/common-protos/k8s.io
 popd >/dev/null || exit
 
