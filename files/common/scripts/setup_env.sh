@@ -163,3 +163,31 @@ if [[ "${1}" == "envfile" ]]; then
   echo "TARGET_ARCH=${TARGET_ARCH}"
   echo "BUILD_WITH_CONTAINER=0"
 fi
+
+# TODO: Use $INPLACE_SED in every script that uses the -i option on sed
+find_inplace_sed() {
+    local tmpfile
+    local POSSIBLE_INPLACE_SED_CMDS
+    local sed_cmd
+    unset INPLACE_SED
+    tmpfile=$(mktemp)
+    POSSIBLE_INPLACE_SED_CMDS=("sed -i" "sed -i ''")
+    for sed_cmd in "${POSSIBLE_INPLACE_SED_CMDS[@]}"; do
+        echo orig > "${tmpfile}"
+        if eval "${sed_cmd}" 's/orig/new/g' "${tmpfile}" >/dev/null 2>&1 ; then
+            INPLACE_SED="${sed_cmd}"
+            break
+        fi
+    done
+    rm "${tmpfile}"
+    if [ -z ${INPLACE_SED+x} ]; then
+        echo "Cannot find a valid inplace sed command from:" "${POSSIBLE_INPLACE_SED_CMDS[@]}"
+        return 1
+    fi
+    export INPLACE_SED
+    return 0
+}
+
+if ! find_inplace_sed; then
+    exit 1
+fi
