@@ -22,6 +22,7 @@
 # limitations under the License.
 
 set -e
+set -x
 
 # The purpose of this file is to unify prow/lib.sh in both istio and istio.io
 # repos to avoid code duplication.
@@ -50,11 +51,13 @@ function load_cluster_topology() {
     exit 1
   fi
 
-  export CLUSTER_NAMES=($(jq -r '.[].cluster_name' ${CLUSTER_TOPOLOGY_CONFIG_FILE}))
-  export CLUSTER_POD_SUBNETS=($(jq -r '.[].pod_subnet' ${CLUSTER_TOPOLOGY_CONFIG_FILE}))
-  export CLUSTER_SVC_SUBNETS=($(jq -r '.[].svc_subnet' ${CLUSTER_TOPOLOGY_CONFIG_FILE}))
-  export CLUSTER_NETWORK_ID=($(jq -r '.[].network_id' ${CLUSTER_TOPOLOGY_CONFIG_FILE}))
-  export NUM_CLUSTERS=$(jq 'length' ${CLUSTER_TOPOLOGY_CONFIG_FILE})
+  readarray -t CLUSTER_NAMES < <(jq -r '.[].cluster_name' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+  readarray -t CLUSTER_POD_SUBNETS < <(jq -r '.[].pod_subnet' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+  readarray -t CLUSTER_SVC_SUBNETS < <(jq -r '.[].svc_subnet' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+  readarray -t CLUSTER_NETWORK_ID < <(jq -r '.[].network_id' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+  
+  export NUM_CLUSTERS
+  NUM_CLUSTERS=$(jq 'length' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
 }
 
 #####################################################################
@@ -94,7 +97,7 @@ function setup_kind_cluster() {
 
   # Patch cluster configuration if IPv6 is required
   if [ "${IP_FAMILY}" = "ipv6" ]; then
-    grep 'ipFamily: ipv6' ${CLUSTER_CONFIG} || \
+    grep 'ipFamily: ipv6' "${CLUSTER_CONFIG}" || \
     cat <<EOF >> "${CLUSTER_CONFIG}"
 networking:
   ipFamily: ipv6
@@ -113,7 +116,7 @@ EOF
 
   # If metrics server configuration directory is specified then deploy in
   # the cluster just created
-  if [[ ! -z ${METRICS_SERVER_CONFIG_DIR} ]]; then
+  if [[ -n ${METRICS_SERVER_CONFIG_DIR} ]]; then
     kubectl apply -f "${METRICS_SERVER_CONFIG_DIR}"
   fi
 }
@@ -171,7 +174,7 @@ EOF
     CLUSTER_KUBECONFIG="${KUBECONFIG_DIR}/${CLUSTER_NAME}"
 
     # Create the clusters.
-    KUBECONFIG="${CLUSTER_KUBECONFIG}" setup_kind_cluster "${CLUSTER_YAML}" "${CLUSTER_NAME}" "${IMAGE}" ${IP_FAMILY}  
+    KUBECONFIG="${CLUSTER_KUBECONFIG}" setup_kind_cluster "${CLUSTER_YAML}" "${CLUSTER_NAME}" "${IMAGE}" "${IP_FAMILY}"  
 
     # Kind currently supports getting a kubeconfig for internal or external usage. To simplify our tests,
     # its much simpler if we have a single kubeconfig that can be used internally and externally.
@@ -198,11 +201,13 @@ EOF
   declare -a KUBECONFIGS
   for CLUSTER_NAME in "${CLUSTER_NAMES[@]}"; do
     KUBECONFIG_FILE="${KUBECONFIG_DIR}/${CLUSTER_NAME}"
-    install_metallb "${KUBECONFIG_FILE}"
+    if [[ ${NUM_CLUSTERS} -gt 1 ]]; then
+      install_metallb "${KUBECONFIG_FILE}"
+    fi
     KUBECONFIGS+=("${KUBECONFIG_FILE}")
   done
 
-  ITER_END=$(($NUM_CLUSTERS-1))
+  ITER_END=$((NUM_CLUSTERS-1))
   for i in $(seq 0 "$ITER_END"); do
     for j in $(seq 0 "$ITER_END"); do
       if [[ "${j}" -gt "${i}" ]]; then
