@@ -51,13 +51,35 @@ function load_cluster_topology() {
     exit 1
   fi
 
-  readarray -t CLUSTER_NAMES < <(jq -r '.[].cluster_name' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
-  readarray -t CLUSTER_POD_SUBNETS < <(jq -r '.[].pod_subnet' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
-  readarray -t CLUSTER_SVC_SUBNETS < <(jq -r '.[].svc_subnet' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
-  readarray -t CLUSTER_NETWORK_ID < <(jq -r '.[].network_id' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
-  
+  export CLUSTER_NAMES
+  export CLUSTER_POD_SUBNETS
+  export CLUSTER_SVC_SUBNETS
+  export CLUSTER_NETWORK_ID
+
+  while read -r value; do
+    CLUSTER_NAMES+=("$value")
+  done < <(jq -r '.[].cluster_name' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+
+  while read -r value; do
+    CLUSTER_POD_SUBNETS+=("$value")
+  done < <(jq -r '.[].pod_subnet' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+
+  while read -r value; do
+    CLUSTER_SVC_SUBNETS+=("$value")
+  done < <(jq -r '.[].svc_subnet' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+
+  while read -r value; do
+    CLUSTER_NETWORK_ID+=("$value")
+  done < <(jq -r '.[].network_id' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+
   export NUM_CLUSTERS
   NUM_CLUSTERS=$(jq 'length' "${CLUSTER_TOPOLOGY_CONFIG_FILE}")
+
+  echo "${CLUSTER_NAMES[@]}"
+  echo "${CLUSTER_POD_SUBNETS[@]}"
+  echo "${CLUSTER_SVC_SUBNETS[@]}"
+  echo "${CLUSTER_NETWORK_ID[@]}"
+  echo "${NUM_CLUSTERS}"
 }
 
 #####################################################################
@@ -77,6 +99,8 @@ function cleanup_kind_cluster() {
 }
 
 # setup_kind_cluster creates new KinD cluster with given name, image and configuration
+# Even in case of single cluster, don't call this directly. Call through setup_kind_clusters
+# with cluster topology configuration file.
 # 1. CLUSTER_CONFIG: KinD cluster configuration YAML file (mandatory)
 # 2. NAME: Name of the Kind cluster (optional)
 # 3. IMAGE: Node image used by KinD (optional)
@@ -84,7 +108,7 @@ function cleanup_kind_cluster() {
 # This function returns 0 when everything goes well, or 1 otherwise
 # If Kind cluster was already created then it would be cleaned up in case of errors
 function setup_kind_cluster() {
-  CLUSTER_CONFIG_YAML=${1:-"./prow/config/trustworthy-jwt.yaml"}
+  CLUSTER_CONFIG_YAML=${1}
   NAME="${2:-istio-testing}"
   IMAGE="${3:-kindest/node:v1.18.2}"
   IP_FAMILY="${4:-ipv4}"
@@ -137,7 +161,6 @@ function cleanup_kind_clusters() {
 # setup_kind_clusters sets up a given number of kind clusters with given topology
 # as specified in cluster topology configuration file.
 # 1. IMAGE = docker image used as node by KinD 
-# 2. CLUSTER_YAML = Kind cluster configuration
 # 2. IP_FAMILY = either ipv4 or ipv6
 # 
 # NOTE: Please call load_cluster_topology before calling this method as it expects
@@ -145,8 +168,12 @@ function cleanup_kind_clusters() {
 function setup_kind_clusters() {
   IMAGE="${1:-kindest/node:v1.18.2}"
   KUBECONFIG_DIR="$(mktemp -d)"
-  DEFAULT_CLUSTER_YAML=${2:-"./prow/config/trustworthy-jwt.yaml"}
-  IP_FAMILY="${3:-ipv4}"
+  IP_FAMILY="${2:-ipv4}"
+
+  if [[ -z "${DEFAULT_CLUSTER_YAML}" ]]; then
+    echo 'DEFAULT_CLUSTER_YAML file must be specified. Exiting...'
+    return 1
+  fi
 
   # The kind tool will error when trying to create clusters in parallel unless we create the network first
   # TODO remove this when kind support creating multiple clusters in parallel - this will break ipv6
