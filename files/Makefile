@@ -39,6 +39,7 @@ export
 $(shell $(shell pwd)/common/scripts/setup_env.sh)
 
 RUN = ./common/scripts/run.sh
+CMD ?= /bin/bash
 
 MAKE_DOCKER = $(RUN) make --no-print-directory -e -f Makefile.core.mk
 
@@ -49,7 +50,7 @@ default:
 	@$(MAKE_DOCKER)
 
 shell:
-	@$(RUN) /bin/bash
+	@$(RUN) $(CMD)
 
 .PHONY: default shell
 
