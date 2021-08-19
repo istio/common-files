@@ -15,10 +15,12 @@
 # limitations under the License.
 set -e
 
-# Allow passing in the new IMAGE_VERSION using that as an environemtn variable
-# or using --image <IMAGE_VERSION>. THe parameter has a higher priority.
+ROOT="$(cd -P "$(dirname -- "$0")" && pwd -P)"
+
+# Allow passing in the new IMAGE_VERSION using that as an environment variable
+# or using --image <IMAGE_VERSION>. The parameter has a higher priority.
 # I did not use getopts to parse parameters and yield errors since this script
-# should run on Macs (no build container in this repo).
+# should run on Macs as ther is no build container used in this repo.
 newBuildImage=$IMAGE_VERSION
 if [[ "$1" == "--image" ]]; then
   newBuildImage=$2
@@ -27,7 +29,6 @@ fi
 # If IMAGE_VERSION isn't specified, get the latest tag for the currently used release in
 # ../files/common/scripts/setup_env.sh
 if [ -z "$newBuildImage" ] ; then
-  ROOT="$(cd -P "$(dirname -- "$0")" && pwd -P)"
   imageRelease=$(grep IMAGE_VERSION= ${ROOT}/../files/common/scripts/setup_env.sh | sed -e 's/^.*=//' | cut -f1,2 -d'-')
 
   # If this isn't a release- branch, cut after the first -
@@ -37,13 +38,15 @@ if [ -z "$newBuildImage" ] ; then
 
   # Get the latest build-tools image for the given release
   newBuildImage=$(curl -sL https://gcr.io/v2/istio-testing/build-tools/tags/list | jq '."manifest"[]["tag"]' | awk '/'$imageRelease'/ && !/latest/' | sort -r | sed  -e 's/^[[:space:]]*"//' -e 's/".*//' | head -n 1)
+
+# If no IMAGE_VERSION is specified and one is not found, output an error
+  if [ -z "$newBuildImage" ] ; then
+    echo No valid IMAGE_VERSION found to replace the current value
+    exit 1
+  fi
 fi
 
-if [ -z "$newBuildImage" ] ; then
-  echo No valid IMAGE_VERSION found to replace the current value
-  exit 1
-fi
 # Update the setup_env script with the new image name
 # Since common-files doesn't use a build image, make this sed work on both Mac and Ubuntu
 echo Updating IMAGE_VERSION to "$newBuildImage"
-sed -i.bak -e "s/IMAGE_VERSION=.*/IMAGE_VERSION=$newBuildImage/" files/common/scripts/setup_env.sh && rm files/common/scripts/setup_env.sh.bak
+sed -i.bak -e "s/IMAGE_VERSION=.*/IMAGE_VERSION=$newBuildImage/" ${ROOT}/../files/common/scripts/setup_env.sh && rm ${ROOT}/../files/common/scripts/setup_env.sh.bak
