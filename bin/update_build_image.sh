@@ -19,8 +19,8 @@ ROOT="$(cd -P "$(dirname -- "$0")" && pwd -P)"
 
 # Allow passing in the new IMAGE_VERSION using that as an environment variable
 # or using --image <IMAGE_VERSION>. The parameter has a higher priority.
-# I did not use getopts to parse parameters and yield errors since this script
-# should run on Macs as ther is no build container used in this repo.
+# Did not use getopts to parse parameters and yield errors since this script
+# should run on Macs as there is no build container used in this repo.
 newBuildImage=$IMAGE_VERSION
 if [[ "$1" == "--image" ]]; then
   newBuildImage=$2
