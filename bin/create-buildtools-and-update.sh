@@ -13,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -e
+set -euxo pipefail
 
 # This script needs two istio repositories, tools and common-files, expecting
 # both will be cloned into a common parent directory. This script will
