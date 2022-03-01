@@ -170,11 +170,11 @@ function setup_kind_cluster() {
     # Kubernetes 1.15+
     CONFIG=${DEFAULT_CLUSTER_YAML}
     # Configure the cluster IP Family only for default configs
-    if [ "${IP_FAMILY}" = "ipv6" ]; then
-      grep 'ipFamily: ipv6' "${CONFIG}" || \
+    if [ "${IP_FAMILY}" != "ipv4" ]; then
+      grep 'ipFamily: ${IP_FAMILY}' "${CONFIG}" || \
       cat <<EOF >> "${CONFIG}"
 networking:
-  ipFamily: ipv6
+  ipFamily: ${IP_FAMILY}
 EOF
     fi
   fi
@@ -189,6 +189,44 @@ EOF
   # the cluster just created
   if [[ -n ${METRICS_SERVER_CONFIG_DIR} ]]; then
     kubectl apply -f "${METRICS_SERVER_CONFIG_DIR}"
+  fi
+
+    # update coredns to use respond to A queries and AAAA queries and not
+  # only the type of the first Cluster IP
+  if [ "${IP_FAMILY}" == "dual" ]; then
+    cat <<EOF | kubectl apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:coredns
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - services
+  - pods
+  - namespaces
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+EOF
+    kubectl patch deployment coredns -n kube-system -p '{"spec":{"template":{"spec":{"containers":[{"name":"coredns","readinessProbe":{"httpGet":{"path":"/health","port":8080}}}]}}}}'
+    kubectl patch deployment coredns -n kube-system -p '{"spec":{"template":{"spec":{"containers":[{"name":"coredns", "image":"coredns/coredns:1.8.7"}]}}}}'
+    kubectl rollout restart -n kube-system deployment coredns
   fi
 
   # Install Metallb if not set to install explicitly
