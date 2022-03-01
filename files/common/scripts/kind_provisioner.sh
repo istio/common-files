@@ -171,7 +171,7 @@ function setup_kind_cluster() {
     CONFIG=${DEFAULT_CLUSTER_YAML}
     # Configure the cluster IP Family only for default configs
     if [ "${IP_FAMILY}" != "ipv4" ]; then
-      grep 'ipFamily: ${IP_FAMILY}' "${CONFIG}" || \
+      grep "ipFamily: ${IP_FAMILY}" "${CONFIG}" || \
       cat <<EOF >> "${CONFIG}"
 networking:
   ipFamily: ${IP_FAMILY}
