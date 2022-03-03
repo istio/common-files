@@ -33,8 +33,11 @@ TEMPDIR_PROMETHEUS="$(mktemp -d /tmp/prometheus-XXXXXXXX)"
 # Upstream GIT tags or branches used for protobufs by repo
 PROTOCOLBUFFERS_TAG="516f8b15603b7f7613e2fb957c55bc56a36b64a6"
 GOOGLEAPIS_TAG="e121a35579e73377f998c11bcc09ba0486736404"
-API_TAG="eb06f43765d3e053d360c9f9755d15004c35e5f9"
-APIMACHINERY_TAG="508c689428e40ab183bc7d43cac6738714bdd3dc"
+
+# Some time in 1.24 alpha range, to pick up go_package fixes. In the future we should use a stable tag, when one launches.
+API_TAG="b8c40e080bc5e830097df540d4ef804034cb5bdb"
+APIMACHINERY_TAG="2936d3f03931b9c06a641799605d8e806cb2a58b"
+
 # gogo/protobuf tag v1.3.2
 GOGO_TAG="b03c65ea87cdc3521ede29f62fe3ce239267c1bc"
 
@@ -78,7 +81,7 @@ popd >/dev/null || exit
 # Retrieve a copy of K8s api proto files
 echo "k8s.io/api"
 pushd "${TEMPDIR_API}" >/dev/null || exit
-git clone -q --single-branch --branch master https://github.com/kubernetes/api.git
+git clone -q https://github.com/kubernetes/api.git
 pushd api >/dev/null || exit
 git checkout -q "${API_TAG}"
 popd >/dev/null || exit
@@ -88,7 +91,7 @@ popd >/dev/null || exit
 # Retrieve a copy of K8s apimachinery proto files
 echo "k8s.io/apimachinery"
 pushd "${TEMPDIR_APIMACHINERY}" >/dev/null || exit
-git clone -q --single-branch --branch master https://github.com/kubernetes/apimachinery.git
+git clone -q https://github.com/kubernetes/apimachinery.git
 pushd apimachinery >/dev/null || exit
 git checkout -q ${APIMACHINERY_TAG}
 popd >/dev/null || exit
