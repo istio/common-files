@@ -22,7 +22,7 @@ import "google/protobuf/descriptor.proto";
 
 // Values applied at the field level
 extend google.protobuf.FieldOptions {
-	// the reason why is 2022 is that this PR may be merged in this year ^_^ 
+	// the reason why is 2022 is that this PR may be merged in this year ^_^
 	IstioFeature feature = 2022;
 }
 
@@ -41,8 +41,8 @@ enum FeatureStatus {
 message IstioFeature {
 	// label the feature's status, available status values may be alpha, beta and stable 
 	// there would be experimental in future.
-	FeatureStatus status = 1;
+	repeated FeatureStatus status = 1;
 	// id means the feature id which can be mapped here: https://github.com/istio/enhancements/blob/master/features.yaml
 	// it should be contained in id section of features under this yaml file.
-	string id = 2;
+	repeated string id = 2;
 }
