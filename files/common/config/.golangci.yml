@@ -113,7 +113,7 @@ linters-settings:
         arguments: [["call-chain"]]
       - name: unconditional-recursion
       - name: identical-branches
-      # the following rule can be enabled in the future
+      # the following rules can be enabled in the future
       # - name: empty-lines
       # - name: confusing-results
       # - name: empty-block
