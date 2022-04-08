@@ -40,7 +40,7 @@ linters:
   - gocritic
   - gofumpt
   - goimports
-  - golint
+  - revive
   - gosimple
   - govet
   - ineffassign
@@ -70,6 +70,67 @@ linters-settings:
   golint:
     # minimal confidence for issues, default is 0.8
     min-confidence: 0.0
+  revive:
+    ignore-generated-header: false
+    severity: "warning"
+    confidence: 0.0
+    error-code: 2
+    warning-code: 1
+    rules:
+      - name: blank-imports
+      - name: context-keys-type
+      - name: time-naming
+      - name: var-declaration
+      - name: unexported-return
+      - name: errorf
+      - name: context-as-argument
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: increment-decrement
+      - name: var-naming
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: indent-error-flow
+      - name: superfluous-else
+      - name: modifies-parameter
+      - name: unreachable-code
+      - name: struct-tag
+      - name: constant-logical-expr
+      - name: bool-literal-in-expr
+      - name: redefines-builtin-id
+      - name: imports-blacklist
+      - name: range-val-in-closure
+      - name: range-val-address
+      - name: waitgroup-by-value
+      - name: atomic
+      - name: call-to-gc
+      - name: duplicated-imports
+      - name: string-of-int
+      - name: defer
+        arguments: [["call-chain"]]
+      - name: unconditional-recursion
+      - name: identical-branches
+      # the following rule can be enabled in the future
+      # - name: empty-lines
+      # - name: confusing-results
+      # - name: empty-block
+      # - name: get-return
+      # - name: confusing-naming
+      # - name: unexported-naming
+      # - name: early-return
+      # - name: unused-parameter
+      # - name: unnecessary-stmt
+      # - name: deep-exit
+      # - name: import-shadowing
+      # - name: modifies-value-receiver
+      # - name: unused-receiver
+      # - name: bare-return
+      # - name: flag-parameter
+      # - name: unhandled-error
+      # - name: if-return
   goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
