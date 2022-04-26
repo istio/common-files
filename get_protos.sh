@@ -51,7 +51,7 @@ cp -a "${REPODIR}"/protos/istio.io "${REPODIR}"/common-protos/istio.io
 # Retrieve a copy of Googles's protobufs
 echo "google/*"
 pushd "${TEMPDIR_PROTOCOLBUFFERS}" >/dev/null || exit
-git clone -q --single-branch --branch master https://github.com/protocolbuffers/protobuf.git
+git clone -q --single-branch --branch main https://github.com/protocolbuffers/protobuf.git
 pushd protobuf >/dev/null || exit
 git checkout -q "${PROTOCOLBUFFERS_TAG}"
 popd >/dev/null || exit
