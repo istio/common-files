@@ -17,4 +17,3 @@ other than `Makefile`. Add the following to your bash profile to see all make
 targets provided by this repo and the repos that use it.
 
     complete -W "\`find . -iname \"?akefil*\" | xargs -I {} grep -hoE '^[a-zA-Z0-9_.-]+:([^=]|$)' {} | sed 's/[^a-zA-Z0-9_.-]*$//' | sort -u\`" make
-
