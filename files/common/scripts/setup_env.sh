@@ -74,6 +74,9 @@ fi
 # Build image to use
 if [[ "${IMAGE_VERSION:-}" == "" ]]; then
   IMAGE_VERSION=master-21f37360cfc984d6ff16821ee423f213d09017e9
+  if [[ "$(uname -m)" == "arm64" || "$(uname -m)" == "aarch64" ]]; then
+    IMAGE_VERSION="${IMAGE_VERSION}-arm64"
+  fi
 fi
 if [[ "${IMAGE_NAME:-}" == "" ]]; then
   IMAGE_NAME=build-tools
