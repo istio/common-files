@@ -449,7 +449,7 @@ spec:
               value: memberlist
             - name: METALLB_DEPLOYMENT
               value: controller
-          image: quay.io/metallb/controller:v0.12.1
+          image: gcr.io/istio-testing/metallb/controller:v0.12.1
           name: controller
           ports:
             - containerPort: 7472
