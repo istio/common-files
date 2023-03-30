@@ -16,6 +16,7 @@
 set -e
 
 ROOT="$(cd -P "$(dirname -- "$0")" && pwd -P)"
+TOOLS_IMAGE_REGISTRY_LIST_URL="${TOOLS_IMAGE_REGISTRY_LIST_URL:-https://gcr.io/v2/istio-testing/build-tools/tags/list}"
 
 # Allow passing in the new IMAGE_VERSION using that as an environment variable
 # or using --image <IMAGE_VERSION>. The parameter has a higher priority.
@@ -37,7 +38,7 @@ if [ -z "$newBuildImage" ] ; then
   fi
 
   # Get the latest build-tools image for the given release
-  newBuildImage=$(curl -sL https://gcr.io/v2/istio-testing/build-tools/tags/list | jq '."manifest"[]["tag"]' | awk '/'$imageRelease'/ && !/latest/' | sort -r | sed  -e 's/^[[:space:]]*"//' -e 's/".*//' | head -n 1)
+  newBuildImage=$(curl -sL $TOOLS_IMAGE_REGISTRY_LIST_URL | jq '."manifest"[]["tag"]' | awk '/'$imageRelease'/ && !/latest/' | sort -r | sed  -e 's/^[[:space:]]*"//' -e 's/".*//' | head -n 1)
 
 # If no IMAGE_VERSION is specified and one is not found, output an error
   if [ -z "$newBuildImage" ] ; then
