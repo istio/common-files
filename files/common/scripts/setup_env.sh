@@ -72,6 +72,9 @@ else
 fi
 
 # Build image to use
+if [[ "${IMAGE_REGISTRY:-}" == "" ]]; then
+  IMAGE_REGISTRY=istio-testing
+fi
 if [[ "${IMAGE_VERSION:-}" == "" ]]; then
   IMAGE_VERSION=master-42499d67179f80bbbeb71bc0f793d1b483cf8937
 fi
@@ -89,7 +92,7 @@ TARGET_OUT_LINUX="${TARGET_OUT_LINUX:-$(pwd)/out/linux_${TARGET_ARCH}}"
 CONTAINER_TARGET_OUT="${CONTAINER_TARGET_OUT:-/work/out/${TARGET_OS}_${TARGET_ARCH}}"
 CONTAINER_TARGET_OUT_LINUX="${CONTAINER_TARGET_OUT_LINUX:-/work/out/linux_${TARGET_ARCH}}"
 
-IMG="${IMG:-gcr.io/istio-testing/${IMAGE_NAME}:${IMAGE_VERSION}}"
+IMG="${IMG:-gcr.io/${IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_VERSION}}"
 
 CONTAINER_CLI="${CONTAINER_CLI:-docker}"
 
