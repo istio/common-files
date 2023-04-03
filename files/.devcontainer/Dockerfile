@@ -27,7 +27,7 @@ FROM gcr.io/istio-testing/build-tools:master-42499d67179f80bbbeb71bc0f793d1b483c
 # - sudo, while not required, is recommended to be installed, since the
 #   workspace user (`gitpod`) is non-root and won't be able to install
 #   and use `sudo` to install any other tools in a live workspace.
-RUN apt-get update && apt-get install -yq \
+RUN apt-get update && apt-get install -yq --no-install-recommends \
     net-tools \
     iproute2 \
     iptables \
