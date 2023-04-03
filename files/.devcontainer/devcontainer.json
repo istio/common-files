@@ -1,0 +1,12 @@
+{
+  "name": "istio build-tools",
+  "dockerFile": "./Dockerfile",
+  "privileged": true,
+"remoteEnv": {
+	"USE_GKE_GCLOUD_AUTH_PLUGIN": "True"
+},
+"features": {
+	"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+	"ghcr.io/mpriscella/features/kind:1": {}
+}
+}
