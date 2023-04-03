@@ -54,25 +54,11 @@ RUN ( \
   ) > /etc/ssh/sshd_remote_dev \
   && mkdir /run/sshd
 
-# Add remote user with a plaintext password.
-ARG REMOTE_USER=user
-ARG REMOTE_USER_PASSWORD=password
-ARG REMOTE_USER_HOME=/home/$REMOTE_USER
-ARG REMOTE_USER_SHELL=/bin/bash
-ARG REMOTE_USER_LOGIN_SCRIPT=$REMOTE_USER_HOME/.bashrc
-ARG REMOTE_USER_ID=3333
-ARG REMOTE_USER_GROUPS=sudo
-RUN useradd -lm \
-  -u $REMOTE_USER_ID \
-  -G $REMOTE_USER_GROUPS \
-  -d $REMOTE_USER_HOME \
-  -s $REMOTE_USER_SHELL \
-  $REMOTE_USER \
-  && yes $REMOTE_USER_PASSWORD | passwd $REMOTE_USER
-
+RUN TMPDIR="$(mktemp -d)"
 # Installing Krew
-RUN cd "$(mktemp -d)" && \
-  OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+WORKDIR $TMPDIR
+RUN OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
   ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" && \
   KREW="krew-${OS}_${ARCH}" && \
   curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" && \
@@ -82,10 +68,5 @@ RUN cd "$(mktemp -d)" && \
 ENV PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 RUN kubectl krew install ns
-
-# Set the rust environment in the remote user login script.
-RUN echo "export CARGO_HOME=$CARGO_HOME" >> $REMOTE_USER_LOGIN_SCRIPT
-RUN echo "export RUSTUP_HOME=$RUSTUP_HOME" >> $REMOTE_USER_LOGIN_SCRIPT
-RUN echo "export PATH=$PATH" >> $REMOTE_USER_LOGIN_SCRIPT
 
 ENV BUILD_WITH_CONTAINER=0
