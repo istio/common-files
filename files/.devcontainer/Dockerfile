@@ -1,25 +1,3 @@
-# Remote docker environment for ztunnel development.
-#
-# Build:
-#   docker build -t ztunnel/remote-env:0.1 -f docker/remote-env/Dockerfile .
-#
-# Run:
-#   docker run -d \
-#       --privileged \
-#       -p 127.0.0.1:2222:22 \
-#       --name ztunnel-dev \
-#       --mount type=bind,source="$PWD",target="/home/user/ztunnel" \
-#       ztunnel/remote-env:0.1
-#
-# Clear credentials:
-#   ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
-#
-# stop:
-#   docker stop ztunnel-dev
-#
-# ssh credentials (test user):
-#   ssh user@localhost -p2222 (enter `password` on the command-line)
-
 FROM gcr.io/istio-testing/build-tools:master-42499d67179f80bbbeb71bc0f793d1b483cf8937
 
 # - git (and git-lfs), for git operations (to e.g. push your work).
@@ -43,16 +21,6 @@ RUN rustup component add rust-src
 ENV CARGO_HOME="/home/.cargo"
 ENV RUSTUP_HOME="/home/.rustup"
 ENV PATH=$CARGO_HOME/bin:$PATH
-
-# Create the configuration file for sshd
-RUN ( \
-    echo 'LogLevel DEBUG2'; \
-    echo 'PermitRootLogin yes'; \
-    echo 'PasswordAuthentication yes'; \
-    echo 'AllowTcpForwarding yes'; \
-    echo 'Subsystem sftp /usr/lib/openssh/sftp-server'; \
-  ) > /etc/ssh/sshd_remote_dev \
-  && mkdir /run/sshd
 
 RUN TMPDIR="$(mktemp -d)"
 # Installing Krew
