@@ -1,12 +1,15 @@
 {
   "name": "istio build-tools",
-  "dockerFile": "./Dockerfile",
+  "image": "ericvn/build-tools:master-latest-amd64", // TODO: @ericvn update to official image
   "privileged": true,
-"remoteEnv": {
-	"USE_GKE_GCLOUD_AUTH_PLUGIN": "True"
-},
-"features": {
-	"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-	"ghcr.io/mpriscella/features/kind:1": {}
-}
+  "remoteEnv": {
+    "USE_GKE_GCLOUD_AUTH_PLUGIN": "True",
+    "BUILD_WITH_CONTAINER":"0",
+    "CARGO_HOME":"/home/.cargo",
+    "RUSTUP_HOME":"/home/.rustup"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/mpriscella/features/kind:1": {}
+  }
 }
