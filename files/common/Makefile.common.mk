@@ -93,7 +93,7 @@ mirror-licenses: mod-download-go
 TMP := $(shell mktemp -d -u)
 UPDATE_BRANCH ?= "master"
 
-BUILD_TOOLS_ORG=${BUILD_TOOLS_ORG:-istio}
+BUILD_TOOLS_ORG ?= "istio"
 
 update-common:
 	@mkdir -p $(TMP)
