@@ -267,8 +267,8 @@ linters-settings:
           # This should only really import operator API, but that is hard to express without a larger refactoring
           - "!**/pkg/kube/**"
           - "!**/pkg/url/**"
-          - "!pkg/test/framework/**"
-          - "!tests/fuzz/**"
+          - "!**/pkg/test/framework/**"
+          - "!**/tests/fuzz/**"
         deny:
           - pkg: istio.io/istio/operator
             desc: "operator should not be imported"
