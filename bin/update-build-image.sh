@@ -54,4 +54,5 @@ fi
 # Since common-files doesn't use a build image, make this sed work on both Mac and Ubuntu
 echo Updating IMAGE_VERSION to "$newBuildImage"
 sed -i.bak -e "s/IMAGE_VERSION=.*/IMAGE_VERSION=$newBuildImage/" ${ROOT}/../files/common/scripts/setup_env.sh && rm ${ROOT}/../files/common/scripts/setup_env.sh.bak
-cat <<< $(jq --arg newBuildImage "$newBuildImage" '.image = $newBuildImage' ${ROOT}/../files/.devcontainer/devcontainer.json) > ${ROOT}/../files/.devcontainer/devcontainer.json
+fullBuildImage=${TOOLS_REGISTRY_PROVIDER}/${PROJECT_ID}/${TOOLS_REGISTRY_REPO}:${newBuildImage}
+cat <<< $(jq --arg fullBuildImage "$fullBuildImage" '.image = $fullBuildImage' ${ROOT}/../files/.devcontainer/devcontainer.json) > ${ROOT}/../files/.devcontainer/devcontainer.json
