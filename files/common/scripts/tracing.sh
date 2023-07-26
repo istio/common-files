@@ -35,15 +35,21 @@ function tracing::extract_prow_trace() {
 
 function _genattrs() {
   # No upstream standard, so copy from https://github.com/jenkinsci/opentelemetry-plugin/blob/master/docs/job-traces.md
+  if [[ -n "${PULL_NUMBER:=}" ]]
+  then
+    url="https://prow.istio.io/view/gs/istio-prow/pr-logs/pull/${REPO_OWNER}_${REPO_NAME}/${PULL_NUMBER}/${JOB_NAME}/${BUILD_ID},"
+  else
+    url="https://prow.istio.io/view/gs/istio-prow/pr-logs/${JOB_NAME}/${BUILD_ID},"
+  fi
   # Use printf instead of echo to avoid spaces between args
   printf '%s' "ci.pipeline.id=${JOB_NAME},"\
     "ci.pipeline.type=${JOB_TYPE},"\
-    "ci.pipeline.run.url=https://prow.istio.io/view/gs/istio-prow/pr-logs/pull/${REPO_OWNER}_${REPO_NAME}/${PULL_NUMBER}/${JOB_NAME}/${BUILD_ID},"\
+    "ci.pipeline.run.url=${url}"\
     "ci.pipeline.run.number=${BUILD_ID},"\
     "ci.pipeline.run.id=${PROW_JOB_ID},"\
     "ci.pipeline.run.repo=${REPO_OWNER}/${REPO_NAME},"\
     "ci.pipeline.run.base=${PULL_BASE_REF},"\
-    "ci.pipeline.run.pull_number=${PULL_NUMBER:-none},"\
+    "ci.pipeline.run.pull_number=${PULL_NUMBER},"\
     "ci.pipeline.run.pull_sha=${PULL_PULL_SHA:-${PULL_BASE_SHA:-none}}"
 }
 
