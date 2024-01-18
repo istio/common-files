@@ -131,7 +131,7 @@ fi
 
 # This function checks if the file exists. If it does, it creates a randomly named host location
 # for the file, adds it to the host KUBECONFIG, and creates a mount for it. Note that we use a copy
-# of the original file, so that the container can write on it.
+# of the original file, so that the container can write to it.
 add_KUBECONFIG_if_exists () {
   if [[ -f "$1" ]]; then
     local local_config
