@@ -93,6 +93,9 @@ items:
   - kind: Group
     apiGroup: rbac.authorization.k8s.io
     name: system:unauthenticated
+  - kind: Group
+    name: system:serviceaccounts
+    apiGroup: rbac.authorization.k8s.io
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: RoleBinding
   metadata:
