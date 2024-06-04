@@ -93,6 +93,19 @@ CONTAINER_TARGET_OUT_LINUX="${CONTAINER_TARGET_OUT_LINUX:-/work/out/linux_${TARG
 
 IMG="${IMG:-${TOOLS_REGISTRY_PROVIDER}/${PROJECT_ID}/${IMAGE_NAME}:${IMAGE_VERSION}}"
 
+# Try to use the latest cached image we have. Use at your own risk, may have incompatibly-old versions
+if [[ "${LATEST_CACHED_IMAGE:-}" != "" ]]; then
+  prefix="$(<<<"$IMAGE_VERSION" cut -d- -f1)"
+  query="${TOOLS_REGISTRY_PROVIDER}/${PROJECT_ID}/${IMAGE_NAME}:${prefix}-*"
+  latest="$(docker images --filter=reference="${query}" --format "{{.CreatedAt|json}}~{{.Repository}}:{{.Tag}}~{{.CreatedSince}}" | sort -n -r | head -n1)"
+  IMG="$(<<<"$latest" cut -d~ -f2)"
+  if [[ "${IMG}" == "" ]]; then
+    echo "Attempted to use LATEST_CACHED_IMAGE, but found no images matching ${query}" >&2
+    exit 1
+  fi
+  echo "Using cached image $IMG, created $(<<<"$latest" cut -d~ -f3)" >&2
+fi
+
 CONTAINER_CLI="${CONTAINER_CLI:-docker}"
 
 ENV_BLOCKLIST="${ENV_BLOCKLIST:-^_\|^PATH=\|^GOPATH=\|^GOROOT=\|^SHELL=\|^EDITOR=\|^TMUX=\|^USER=\|^HOME=\|^PWD=\|^TERM=\|^RUBY_\|^GEM_\|^rvm_\|^SSH=\|^TMPDIR=\|^CC=\|^CXX=\|^MAKEFILE_LIST=}"
