@@ -194,6 +194,9 @@ function setup_kind_cluster() {
   # Workaround kind issue causing taints to not be removed in 1.24
   kubectl taint nodes "${NAME}"-control-plane node-role.kubernetes.io/control-plane- 2>/dev/null || true
 
+  # Remove the label from the nodes to ensure LoadBalancer IPs are accessible from the host network, specifically for single-node clusters.
+  kubectl label nodes --all node.kubernetes.io/exclude-from-external-load-balancers- 2>/dev/null || true
+
   # Determine what CNI to install
   case "${KUBERNETES_CNI:-}" in 
 
