@@ -132,3 +132,7 @@ allowlisted_modules:
 # gonum.org/v1/gonum/graph/formats/rdf/testdata/LICENSE.md
 - gonum.org/v1/gonum
 
+# go license, with header auth
+# https://github.com/golang/go/blob/master/LICENSE
+- gopkg.in/inf.v0
+
