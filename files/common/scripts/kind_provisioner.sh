@@ -195,12 +195,11 @@ function setup_kind_cluster() {
 
   if [[ "${DEVCONTAINER}" ]]; then
     # identify our docker container id using proc and regex
-    containerid=$(cat /proc/self/mountinfo | grep 'resolv.conf' | sed 's/.*\/docker\/containers\/\([0-9a-f]*\).*/\1/')
+    containerid=$(grep 'resolv.conf' /proc/self/mountinfo | sed 's/.*\/docker\/containers\/\([0-9a-f]*\).*/\1/')
     docker network connect kind "$containerid"
     kind export kubeconfig --name="${NAME}" --internal
-    # kubectl config set clusters.kind-istio-testing.server https://istio-testing-control-plane:6443
   fi
-  
+
   # Workaround kind issue causing taints to not be removed in 1.24
   kubectl taint nodes "${NAME}"-control-plane node-role.kubernetes.io/control-plane- 2>/dev/null || true
 
