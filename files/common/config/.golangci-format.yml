@@ -12,6 +12,31 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
+    rules:
+      - linters:
+          - errcheck
+        path: _test\.go$|tests/|samples/
+      - linters:
+          - staticcheck
+        text: 'SA1019: package github.com/golang/protobuf/jsonpb'
+      - linters:
+          - staticcheck
+        text: 'SA1019: "github.com/golang/protobuf/jsonpb"'
+      - linters:
+          - staticcheck
+        text: 'SA1019: grpc.Dial is deprecated: use NewClient instead'
+      - linters:
+          - staticcheck
+        text: 'SA1019: grpc.DialContext is deprecated: use NewClient instead'
+      - linters:
+          - staticcheck
+        text: 'SA1019: grpc.WithBlock is deprecated'
+      - linters:
+          - staticcheck
+        text: 'SA1019: grpc.FailOnNonTempDialError'
+      - linters:
+          - staticcheck
+        text: 'SA1019: grpc.WithReturnConnectionError'
     paths:
       - .*\.pb\.go
       - .*\.gen\.go
