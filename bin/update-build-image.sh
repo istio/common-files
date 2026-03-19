@@ -17,8 +17,8 @@ set -e
 
 ROOT="$(cd -P "$(dirname -- "$0")" && pwd -P)"
 
-TOOLS_REGISTRY_PROVIDER=${TOOLS_REGISTRY_PROVIDER:-gcr.io}
-PROJECT_ID=${PROJECT_ID:-istio-testing}
+TOOLS_REGISTRY_PROVIDER=${TOOLS_REGISTRY_PROVIDER:-registry.istio.io}
+PROJECT_ID=${PROJECT_ID:-testing}
 TOOLS_REGISTRY_REPO=${TOOLS_REGISTRY_REPO:-build-tools}
 
 # Allow passing in the new IMAGE_VERSION using that as an environment variable

@@ -22,4 +22,4 @@ lint:
 	@rm files/Makefile.core.mk files/Makefile.overrides.mk
 
 update-build-image:
-	@bin/update_build_image.sh
+	@bin/update-build-image.sh
