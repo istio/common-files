@@ -345,7 +345,7 @@ EOF
   for CLUSTER_NAME in "${CLUSTER_NAMES[@]}"; do
     KUBECONFIG_FILE="${KUBECONFIG_DIR}/${CLUSTER_NAME}"
     if [[ ${NUM_CLUSTERS} -gt 1 ]]; then
-      if [[ -z "${NOMETALBINSTALL}" ]]; then
+      if [[ -z "${NOMETALBINSTALL:-}" ]]; then
         retry install_metallb "${KUBECONFIG_FILE}"
       fi
     fi
