@@ -184,9 +184,13 @@ function setup_kind_cluster() {
     KIND_DISABLE_CNI="true"
   fi
 
+  if [[ -n "${ECR_REGISTRY:-}" ]]; then
+    ensure_ecr_docker_config
+  fi
+
   # Create KinD cluster
   if ! (yq eval "${CONFIG}" --expression ".networking.disableDefaultCNI = ${KIND_DISABLE_CNI}" \
-    --expression ".networking.ipFamily = \"${KIND_IP_FAMILY}\"" | \
+    --expression ".networking.ipFamily = \"${KIND_IP_FAMILY}\"" | configure_kind_node_registry_auth | \
     kind create cluster --name="${NAME}" -v4 --retain --image "${IMAGE}" ${KIND_WAIT_FLAG:+"$KIND_WAIT_FLAG"} --config -); then
     echo "Could not setup KinD environment. Something wrong with KinD setup. Exporting logs."
     return 9
@@ -208,7 +212,7 @@ function setup_kind_cluster() {
 
     "calico")
       echo "Installing Calico CNI"
-      install_calico "" "$(dirname "$CONFIG")"
+      install_calico "${KUBECONFIG:-}" "$(dirname "$CONFIG")"
       ;;
 
     "")
@@ -225,12 +229,12 @@ function setup_kind_cluster() {
   # If metrics server configuration directory is specified then deploy in
   # the cluster just created
   if [[ -n ${METRICS_SERVER_CONFIG_DIR:-} ]]; then
-    retry kubectl apply -f "${METRICS_SERVER_CONFIG_DIR}"
+    retry install_metrics_server "${METRICS_SERVER_CONFIG_DIR}"
   fi
 
   # Install Metallb if not set to install explicitly
   if [[ -z "${NOMETALBINSTALL}" ]]; then
-    retry install_metallb ""
+    retry install_metallb "${KUBECONFIG:-}"
   fi
 
   # IPv6 clusters need some CoreDNS changes in order to work in CI:
@@ -401,69 +405,75 @@ function install_calico {
   local CONFIG_DIR="${2}"
 
   echo "Setting up ambient cluster, Calico CNI will be used."
-  kubectl --kubeconfig="$KUBECONFIG" apply -f "${CONFIG_DIR}"/calico.yaml
+  sed "s?registry.istio.io/testing/calico?${CALICO_REGISTRY:-registry.istio.io/testing}/calico?g" \
+    "${CONFIG_DIR}"/calico.yaml | kubectl --kubeconfig="$KUBECONFIG" apply -f -
 
   kubectl --kubeconfig="$KUBECONFIG" wait --for condition=ready -n kube-system pod -l k8s-app=calico-node --timeout 90s
   kubectl --kubeconfig="$KUBECONFIG" wait --for condition=ready -n kube-system pod -l k8s-app=calico-kube-controllers --timeout 90s
 }
 
-function configure_ecr_image_pull_secret() {
-  local KUBECONFIG="${1}"
-  local ecr_password
-  local xtrace_enabled=false
+function install_metrics_server {
+  local CONFIG_DIR="${1}"
 
+  sed "s?registry.k8s.io/metrics-server?${METRICS_SERVER_REGISTRY:-registry.k8s.io}/metrics-server?g" \
+    "${CONFIG_DIR}"/metrics.yaml | kubectl apply -f -
+}
+
+function ensure_ecr_docker_config() {
   if [[ -z "${ECR_REGISTRY:-}" ]]; then
     return
   fi
 
+  if [[ -n "${ECR_DOCKER_CONFIG_FILE:-}" ]]; then
+    return
+  fi
+
+  ECR_DOCKER_CONFIG_FILE=$(mktemp "${TMPDIR:-/tmp}/ecr-docker-config.XXXXXX.json")
+  export ECR_DOCKER_CONFIG_FILE
+
+  local ecr_password
+  local xtrace_enabled=false
   if [[ "$-" == *x* ]]; then
     xtrace_enabled=true
     set +x
   fi
-
   ecr_password=$(aws ecr get-login-password)
-  kubectl --kubeconfig="$KUBECONFIG" --namespace metallb-system create secret docker-registry ecr-pull-secret \
+  kubectl create secret docker-registry ecr-registry-credentials \
     --docker-server="${ECR_REGISTRY}" \
     --docker-username=AWS \
     --docker-password="${ecr_password}" \
     --dry-run=client \
-    --output=yaml | kubectl --kubeconfig="$KUBECONFIG" --namespace metallb-system apply -f -
+    --output=jsonpath='{.data.\.dockerconfigjson}' | base64 --decode > "${ECR_DOCKER_CONFIG_FILE}"
   unset ecr_password
-
+  chmod 0600 "${ECR_DOCKER_CONFIG_FILE}"
   if [[ "${xtrace_enabled}" == true ]]; then
     set -x
   fi
 }
 
-function configure_metallb_image_pull_secret() {
-  local KUBECONFIG="${1}"
-
+function configure_kind_node_registry_auth() {
   if [[ -z "${ECR_REGISTRY:-}" ]]; then
+    cat
     return
   fi
+  if [[ ! -r "${ECR_DOCKER_CONFIG_FILE:-}" ]]; then
+    echo "ECR_DOCKER_CONFIG_FILE must point to a readable Docker config" >&2
+    return 1
+  fi
 
-  for service_account in controller speaker; do
-    cat <<EOF | kubectl --kubeconfig="$KUBECONFIG" apply --server-side --field-manager=istio-ecr-pull-secret -f -
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ${service_account}
-  namespace: metallb-system
-imagePullSecrets:
-- name: ecr-pull-secret
-EOF
-  done
-
+  yq eval '
+    (.nodes = (.nodes // [{"role": "control-plane"}])) |
+    (.nodes[].extraMounts |= (. // [])) |
+    .nodes[].extraMounts += [{
+      "hostPath": strenv(ECR_DOCKER_CONFIG_FILE),
+      "containerPath": "/var/lib/kubelet/config.json",
+      "readOnly": true
+    }]
+  ' -
 }
 
 function install_metallb() {
   KUBECONFIG="${1}"
-  if [[ -n "${ECR_REGISTRY:-}" ]]; then
-    kubectl --kubeconfig="$KUBECONFIG" create namespace metallb-system --dry-run=client --output=yaml | \
-      kubectl --kubeconfig="$KUBECONFIG" apply -f -
-    configure_ecr_image_pull_secret "$KUBECONFIG"
-    configure_metallb_image_pull_secret "$KUBECONFIG"
-  fi
   sed "s?registry.istio.io/testing?${METALLB_REGISTRY:-registry.istio.io/testing}?g" \
     "${COMMON_SCRIPTS}/metallb-native.yaml" | kubectl --kubeconfig="$KUBECONFIG" apply -f -
   kubectl --kubeconfig="$KUBECONFIG" wait -n metallb-system pod --timeout=120s -l app=metallb --for=condition=Ready
