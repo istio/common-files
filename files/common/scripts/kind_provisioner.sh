@@ -30,9 +30,11 @@ set -x
 ####################################################################
 #################   COMMON SECTION   ###############################
 ####################################################################
+# KIND_IMAGE_PREFIX is used to set a different registry for KinD images
+KIND_IMAGE_PREFIX=${KIND_IMAGE_PREFIX:-docker.io/kindest/node}
 
 # DEFAULT_KIND_IMAGE is used to set the Kubernetes version for KinD unless overridden in params to setup_kind_cluster(s)
-DEFAULT_KIND_IMAGE="docker.io/kindest/node:v1.37.0"
+DEFAULT_KIND_IMAGE="${KIND_IMAGE_PREFIX}:v1.37.0"
 
 # the default kind cluster should be ipv4 if not otherwise specified
 KIND_IP_FAMILY="${KIND_IP_FAMILY:-ipv4}"
