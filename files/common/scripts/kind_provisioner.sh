@@ -217,13 +217,17 @@ function setup_kind_cluster() {
       install_calico "" "$(dirname "$CONFIG")"
       ;;
 
+    "cilium")
+      install_cilium "${NAME}" || return
+      ;;
+
     "")
       # perfectly fine, we accepted the default KinD CNI
       ;;
 
     *)
       # we don't know what to do but we've got no CNI, return non-zero
-      echo "${KUBERNETES_CNI} is not recognized. Supported options are \"calico\" or do not set the variable to use default."
+      echo "${KUBERNETES_CNI} is not recognized. Supported options are \"calico\", \"cilium\", or unset for the default."
       return 1
       ;;
   esac
@@ -400,6 +404,38 @@ function connect_kind_clusters() {
     docker exec "${C2_NODE}" ip route add "${C1_POD_CIDR}" via "${C1_DOCKER_IP}"
     docker exec "${C2_NODE}" ip route add "${C1_SVC_CIDR}" via "${C1_DOCKER_IP}"
   fi
+}
+
+function install_cilium {
+  local NAME="${1}"
+  if [[ "${KIND_IP_FAMILY}" != "ipv4" ]]; then
+    echo "Cilium CI provisioning currently supports IPv4 only." >&2
+    return 1
+  fi
+  local API_HOST
+  API_HOST=$(docker inspect --format '{{(index .NetworkSettings.Networks "kind").IPAddress}}' "${NAME}-control-plane") || return
+  if [[ -z "${API_HOST}" ]]; then
+    echo "Cannot find the kind API server's IPv4 address." >&2
+    return 1
+  fi
+  # Keep BPF host routing and masquerading enabled. Endpoint routes avoid the
+  # ENABLE_SKIP_FIB path in this pinned version, allowing host-local fallback.
+  helm upgrade --install cilium oci://quay.io/cilium/charts/cilium \
+    --version 1.18.14 --namespace kube-system \
+    --set cni.exclusive=false \
+    --set ipam.mode=kubernetes \
+    --set operator.replicas=1 \
+    --set routingMode=native \
+    --set autoDirectNodeRoutes=true \
+    --set ipv4NativeRoutingCIDR=10.244.0.0/16 \
+    --set kubeProxyReplacement=true \
+    --set "k8sServiceHost=${API_HOST}" --set k8sServicePort=6443 \
+    --set socketLB.hostNamespaceOnly=true \
+    --set bpf.hostLegacyRouting=false --set bpf.masquerade=true \
+    --set endpointRoutes.enabled=true \
+    --set envoy.enabled=false --set l7Proxy=false \
+    --wait --timeout 5m || return
+  kubectl rollout status daemonset/cilium -n kube-system --timeout=300s
 }
 
 function install_calico {
